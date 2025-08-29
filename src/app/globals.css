@@ -10,6 +10,8 @@
   --color-brand-blue: #1980e5;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sub-text: #6e6e6e;
+  --color-surface-gray: #d9d9d9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,4 +23,11 @@
 body {
   background: var(--background);
   color: black;
+}
+
+.blue-border {
+  border: 10px rgba(25, 128, 229, 0.3);
+}
+.blue-border:hover {
+  border: 10px rgba(25, 128, 229, 1);
 }

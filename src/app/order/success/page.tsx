@@ -1,40 +1,39 @@
-"use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-export default function SuccessPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [orderId, setOrderId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setOrderId(searchParams.get("orderId"));
-  }, [searchParams]);
+export default function SuccessPage({
+  searchParams,
+}: {
+  searchParams: { orderId?: string };
+}) {
+  const orderId = searchParams.orderId ?? "";
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen ">
-      <div className="bg-green-500 flex justify-center flex-col items-center rounded-xl py-10 px-10 text-white">
+    <div className="flex flex-col items-center justify-center h-screen">
+      <div className="bg-green-500 flex flex-col items-center rounded-xl py-10 px-10 text-white">
         <Image
           src="/check.png"
           alt="success tick icon"
-          width={512}
-          height={512}
-          className="h-20 w-fit mb-2"
+          width={80}
+          height={80}
+          className="mb-2"
         />
         <div className="text-3xl font-semibold mb-2">
           Your Order is Confirmed!
         </div>
         <div className="font-semibold w-10/12 text-center mb-1">
-          We've received your order, will be shipped in 3-5 business days.
+          {"We've received your order, will be shipped in 3-5 business days."}
         </div>
         <div className="font-medium">
           Your OrderID: <span className="font-semibold">{orderId}</span>
         </div>
-        <button
-          className="border-2 mt-4 border-white cursor-pointer rounded-lg bg-transparent px-2 py-1 font-semibold hover:bg-white hover:text-green-500 transition-all duration-200"
-          onClick={() => router.push("/")}
-        >
-          Back to home
-        </button>
+        <form action="/">
+          <button
+            type="submit"
+            className="cursor-pointer border-2 mt-4 border-white rounded-lg bg-transparent px-3 py-1.5 font-semibold hover:bg-white hover:text-green-600 transition"
+          >
+            Back to home
+          </button>
+        </form>
       </div>
     </div>
   );

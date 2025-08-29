@@ -1,3 +1,5 @@
+import RouterButton from "./router-button";
+
 const Footer = () => {
   return (
     <div className="bg-brand-blue text-white px-3 md:px-20">
@@ -10,23 +12,42 @@ const Footer = () => {
           </div>
         </div>
         <div className="">
-          <div className="text-[25px] sm:mb-2 underline underline-offset-4 sm:no-underline">
-            Socials
-          </div>
+          <div className="text-[25px] mb-2  ">Socials</div>
           <div className="flex flex-row gap-x-5 sm:flex-col">
-            <div className="text-lg cursor-pointer">Instagram</div>
-            <div className="text-lg cursor-pointer">Whatsapp</div>
+            <a
+              href="https://www.instagram.com/click_.d/"
+              target="_blank"
+              className="text-lg cursor-pointer"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://wa.me/919841105220"
+              target="_blank"
+              className="text-lg cursor-pointer"
+            >
+              Whatsapp
+            </a>
           </div>
         </div>
         <div className="">
-          <div className="text-[25px] mb-2 underline underline-offset-4 sm:no-underline">
-            Quick Links
-          </div>
+          <div className="text-[25px] mb-2 ">Quick Links</div>
           <div className="flex flex-row gap-x-5 sm:flex-col ">
-            <div className="text-lg cursor-pointer">Home</div>
-            <div className="text-lg cursor-pointer">How it works</div>
-            <div className="text-lg cursor-pointer">Pricing</div>
-            <div className="text-lg cursor-pointer">Contact</div>
+            <RouterButton
+              styles="text-lg w-fit cursor-pointer"
+              route=""
+              title="Home"
+            />
+            <RouterButton
+              styles="text-lg w-fit cursor-pointer"
+              route="order"
+              title="Order"
+            />
+            <RouterButton
+              styles="text-lg w-fit cursor-pointer"
+              route="contact"
+              title="Contact"
+            />
           </div>
         </div>
       </div>

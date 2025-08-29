@@ -1,7 +1,0 @@
-<svg width="884" height="663" viewBox="0 0 884 663" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="663" width="221" height="442" transform="rotate(90 663 0)" fill="white"/>
-<circle cx="774" cy="110" r="75" fill="#1980E5"/>
-<rect x="0.000976562" y="221" width="221" height="442" fill="white"/>
-<rect x="884" y="663" width="221" height="442" transform="rotate(-180 884 663)" fill="white"/>
-<path d="M442 221C564.055 221 663 319.945 663 442C663 564.055 564.055 663 442 663C319.945 663 221 564.055 221 442C221 319.945 319.945 221 442 221ZM442 317C372.964 317 317 372.964 317 442C317 511.036 372.964 567 442 567C511.036 567 567 511.036 567 442C567 372.964 511.036 317 442 317Z" fill="white"/>
-</svg>

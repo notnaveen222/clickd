@@ -1,41 +1,47 @@
-"use client";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
-export default function FailurePage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const orderID = searchParams.get("orderId");
+import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+
+export default function FailurePage({
+  searchParams,
+}: {
+  searchParams: { orderId?: string };
+}) {
+  const orderId = searchParams.orderId ?? "";
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen ">
-      <div className="bg-red-600 flex justify-center flex-col items-center rounded-xl py-10 px-10 text-white">
+    <div className="flex flex-col items-center justify-center h-screen">
+      <div className="bg-red-600 flex flex-col items-center rounded-xl py-10 px-10 text-white">
         <Image
           src="/cross.png"
-          alt="success tick icon"
-          width={512}
-          height={512}
-          className="h-20 w-fit mb-2"
+          alt="payment failed icon"
+          width={80}
+          height={80}
+          className="mb-2"
         />
-        <div className="text-3xl font-semibold mb-2">Order Failed!</div>
+        <div className="text-3xl font-semibold mb-2">Order Failed</div>
         <div className="font-semibold w-10/12 text-center mb-1">
-          If money has been debited in your account, dont worry. please contact
-          us.
+          {
+            "If an amount was debited, don't worry—please contact us and we'll help."
+          }
         </div>
         <div className="font-medium">
-          Your OrderID: <span className="font-semibold">{orderID}</span>
+          Your Order ID: <span className="font-semibold">{orderId}</span>
         </div>
-        <div className="flex gap-x-2">
-          <button
-            className="border-2 mt-4 border-white cursor-pointer rounded-lg bg-transparent px-2 py-1 font-semibold hover:bg-white hover:text-red-600 transition-all duration-200"
-            onClick={() => router.push("/contact")}
+        <div className="flex gap-x-2 mt-4">
+          <Link
+            href="/contact"
+            className="border-2 border-white rounded-lg bg-transparent px-3 py-1.5 font-semibold hover:bg-white hover:text-red-600 transition"
           >
             Contact
-          </button>
-          <button
-            className="border-2 mt-4 border-white cursor-pointer rounded-lg bg-transparent px-2 py-1 font-semibold hover:bg-white hover:text-red-600 transition-all duration-200"
-            onClick={() => router.push("/")}
+          </Link>
+          <Link
+            href="/"
+            className="border-2 border-white rounded-lg bg-transparent px-3 py-1.5 font-semibold hover:bg-white hover:text-red-600 transition"
           >
             Back to home
-          </button>
+          </Link>
         </div>
       </div>
     </div>

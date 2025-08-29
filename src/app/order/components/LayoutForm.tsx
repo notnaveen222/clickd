@@ -17,7 +17,7 @@ const stripLayouts = [
     photos: 3,
     description: "3 Photos in classic strip format, ",
     price: 179,
-    image_url: "/layouts/3photostrip.svg",
+    image_url: "/layouts/3photostrip.png",
   },
   {
     id: "1x4",
@@ -25,7 +25,7 @@ const stripLayouts = [
     photos: 4,
     description: "4 Photos in classic strip format, ",
     price: 199,
-    image_url: "/layouts/4photostrip.svg",
+    image_url: "/layouts/4photostrip.png",
   },
 ];
 
@@ -37,7 +37,7 @@ export default function LayoutPage({
   setSelectedLayout(layout: layout): void;
 }) {
   return (
-    <div className="border border-gray-200 p-5 rounded-xl shadow-md">
+    <div className="border border-gray-200 p-5 mx-2 rounded-xl shadow-md">
       <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
         <ImageIcon className="text-brand-blue size-6" />
         Choose Your Strip Layout

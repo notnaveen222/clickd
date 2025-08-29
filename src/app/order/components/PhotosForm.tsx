@@ -1,7 +1,15 @@
 "use client";
 import { layout } from "../page";
 import { Camera, Upload } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
+
+const IMAGE_FORMAT_ALLOWED = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
 
 export default function PhotosPage({
   selectedLayout,
@@ -20,42 +28,69 @@ export default function PhotosPage({
   setPhotoMethod: (method: "take" | "upload" | null) => void;
   setPhotos: React.Dispatch<React.SetStateAction<File[]>>;
 }) {
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    fetch("/api/session/init").catch(() => {});
+  }, []);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedLayout) return;
 
-    const perStrip = selectedLayout.photos; // e.g., 4
-    const incoming = Array.from(event.target.files || []);
+    const perStrip = selectedLayout.photos; // HARD CAP = strip size only
+    const incoming = Array.from(e.target.files || []);
+    e.target.value = ""; // allow re-selecting same files
     if (incoming.length === 0) return;
 
+    // filter allowed types
+    const valid = incoming.filter((f) => {
+      const ok = IMAGE_FORMAT_ALLOWED.includes(f.type);
+      if (!ok) console.warn("Unsupported type:", f.name, f.type);
+      return ok;
+    });
+    if (valid.length === 0) return;
+
+    // 1) OPTIMISTIC UI: add immediately, capped to strip size
+    let toUpload: File[] = [];
     setPhotos((prev) => {
-      // How many we can add to keep total a multiple of perStrip?
-      const current = prev.length;
-      const targetTotal = current + incoming.length;
-
-      // Max total we allow right now = greatest multiple of perStrip not exceeding targetTotal
-      const allowedTotal =
-        perStrip > 0
-          ? Math.floor(targetTotal / perStrip) * perStrip
-          : targetTotal;
-
-      const canAdd = Math.max(0, allowedTotal - current);
-      const toAdd = incoming.slice(0, canAdd);
-
-      // Hint messaging
-      if (toAdd.length === 0) {
-        // Already at a clean multiple — tell user how many are needed to start the next set
-        const neededForNextSet =
-          perStrip > 0 ? perStrip - (current % perStrip || 0) : 0;
-
-        return prev;
-      }
-
-      return [...prev, ...toAdd];
+      if (prev.length >= perStrip) return prev;
+      const remaining = Math.max(0, perStrip - prev.length);
+      toUpload = valid.slice(0, remaining);
+      return remaining ? [...prev, ...toUpload] : prev;
     });
 
-    // Clear the file input so selecting the same files again still triggers onChange
-    event.target.value = "";
+    if (toUpload.length === 0) return;
+
+    // 2) BACKGROUND UPLOAD (doesn't block UI)
+    // (async () => {
+    //   await Promise.all(
+    //     toUpload.map(async (file) => {
+    //       try {
+    //         // get signed slot (uses cookie session if your API expects it)
+    //         const res = await fetch("/api/storage/signed-upload", {
+    //           method: "POST",
+    //           headers: { "Content-Type": "application/json" },
+    //           credentials: "include",
+    //           body: JSON.stringify({ filename: file.name }),
+    //         });
+    //         const json = await res.json();
+    //         if (!res.ok) throw new Error(json?.error || "signed-upload failed");
+
+    //         const { path, token } = json;
+
+    //         // upload to Supabase
+    //         const { error } = await supabase.storage
+    //           .from("order-photos")
+    //           .uploadToSignedUrl(path, token, file, { contentType: file.type });
+
+    //         if (error) throw error;
+    //       } catch (err) {
+    //         console.error("Upload failed:", file.name, err);
+    //         // OPTIONAL: if an upload fails, remove that file from the UI
+    //         // setPhotos((prev) => prev.filter((f) => f !== file));
+    //       }
+    //     })
+    //   );
+    // })();
   };
+
   return (
     <>
       {currentStep == 2 && (

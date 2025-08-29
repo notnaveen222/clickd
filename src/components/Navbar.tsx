@@ -7,7 +7,7 @@ export default function Navbar() {
     <div className="w-full h-[80px] border-b border-b-black/15 flex items-center justify-between px-10">
       <Image
         onClick={() => router.push("/")}
-        src="/clickd2.svg"
+        src="/clickd_navbar_logo.svg"
         alt="clickd Logo"
         height={125}
         width={125}

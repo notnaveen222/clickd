@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { readSessionId, setSessionCookie } from "@/lib/session";
+import { setNewSessionCookie } from "@/lib/session";
 import { randomUUID } from "crypto";
 
 export async function GET() {
-  let sid = await readSessionId();
-  const res = NextResponse.json({ sessionId: sid ?? "" });
-  if (!sid) {
-    sid = randomUUID();
-    setSessionCookie(res, sid);
-  }
+  const res = NextResponse.json({});
+  const sid = randomUUID();
+  await setNewSessionCookie(res, sid);
   return res;
 }

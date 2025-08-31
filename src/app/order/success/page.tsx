@@ -1,11 +1,12 @@
 import Image from "next/image";
 
-export default function SuccessPage({
+export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: { orderId?: string };
+  searchParams: Promise<{ orderId?: string }>;
 }) {
-  const orderId = searchParams.orderId ?? "";
+  const params = await searchParams;
+  const orderId = params.orderId ?? "";
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">

@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
-
-export default function FailurePage({
+export default async function FailurePage({
   searchParams,
 }: {
-  searchParams: { orderId?: string };
+  searchParams: Promise<{ orderId?: string }>;
 }) {
-  const orderId = searchParams.orderId ?? "";
+  const params = await searchParams;
+  const orderId = params.orderId ?? "";
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
@@ -26,9 +25,12 @@ export default function FailurePage({
             "If an amount was debited, don't worry—please contact us and we'll help."
           }
         </div>
+
         <div className="font-medium">
-          Your Order ID: <span className="font-semibold">{orderId}</span>
+          Your Order ID:{" "}
+          <span className="font-semibold">{orderId || "N/A"}</span>
         </div>
+
         <div className="flex gap-x-2 mt-4">
           <Link
             href="/contact"

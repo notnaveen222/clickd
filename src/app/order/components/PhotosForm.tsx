@@ -1,7 +1,7 @@
 "use client";
 import { layout } from "../page";
 import { Camera, Upload } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 
 const IMAGE_FORMAT_ALLOWED = [
   "image/jpeg",
@@ -28,67 +28,27 @@ export default function PhotosPage({
   setPhotoMethod: (method: "take" | "upload" | null) => void;
   setPhotos: React.Dispatch<React.SetStateAction<File[]>>;
 }) {
-  useEffect(() => {
-    fetch("/api/session/init").catch(() => {});
-  }, []);
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedLayout) return;
-
-    const perStrip = selectedLayout.photos; // HARD CAP = strip size only
-    const incoming = Array.from(e.target.files || []);
-    e.target.value = ""; // allow re-selecting same files
-    if (incoming.length === 0) return;
-
-    // filter allowed types
-    const valid = incoming.filter((f) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (files.length == 0) return;
+    const valid = files.filter((f) => {
       const ok = IMAGE_FORMAT_ALLOWED.includes(f.type);
-      if (!ok) console.warn("Unsupported type:", f.name, f.type);
+      if (!ok) console.warn("Unsupported file type:", f.name, f.type);
       return ok;
     });
+
     if (valid.length === 0) return;
+    const targetTotal = selectedLayout.photos * Math.max(1, quantity || 1);
 
-    // 1) OPTIMISTIC UI: add immediately, capped to strip size
-    let toUpload: File[] = [];
+    // push immediately to UI (capped to targetTotal)
     setPhotos((prev) => {
-      if (prev.length >= perStrip) return prev;
-      const remaining = Math.max(0, perStrip - prev.length);
-      toUpload = valid.slice(0, remaining);
-      return remaining ? [...prev, ...toUpload] : prev;
+      const remaining = Math.max(targetTotal - prev.length, 0);
+      if (remaining <= 0) return prev; // already have enough
+      const toAdd = valid.slice(0, remaining);
+      return [...prev, ...toAdd];
     });
-
-    if (toUpload.length === 0) return;
-
-    // 2) BACKGROUND UPLOAD (doesn't block UI)
-    // (async () => {
-    //   await Promise.all(
-    //     toUpload.map(async (file) => {
-    //       try {
-    //         // get signed slot (uses cookie session if your API expects it)
-    //         const res = await fetch("/api/storage/signed-upload", {
-    //           method: "POST",
-    //           headers: { "Content-Type": "application/json" },
-    //           credentials: "include",
-    //           body: JSON.stringify({ filename: file.name }),
-    //         });
-    //         const json = await res.json();
-    //         if (!res.ok) throw new Error(json?.error || "signed-upload failed");
-
-    //         const { path, token } = json;
-
-    //         // upload to Supabase
-    //         const { error } = await supabase.storage
-    //           .from("order-photos")
-    //           .uploadToSignedUrl(path, token, file, { contentType: file.type });
-
-    //         if (error) throw error;
-    //       } catch (err) {
-    //         console.error("Upload failed:", file.name, err);
-    //         // OPTIONAL: if an upload fails, remove that file from the UI
-    //         // setPhotos((prev) => prev.filter((f) => f !== file));
-    //       }
-    //     })
-    //   );
-    // })();
   };
 
   return (

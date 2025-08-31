@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import crypto from "crypto";
+import { confirmUploadedPhotos } from "@/lib/supabase-actions";
+import { readSessionId } from "@/lib/session";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-      await req.json();
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      client_order_id,
+    } = await req.json();
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -26,6 +32,7 @@ export async function POST(req: NextRequest) {
     );
 
     // 2) update order row
+    const sid = await readSessionId();
     const update = verified
       ? {
           razorpay_payment_id,
@@ -40,7 +47,12 @@ export async function POST(req: NextRequest) {
           signature_verified: false,
           status: "FAILED",
         };
-
+    if (verified && sid) {
+      confirmUploadedPhotos({
+        sessionId: sid,
+        clientOrderId: client_order_id,
+      });
+    }
     const { error } = await supabase
       .from("orders")
       .update(update)

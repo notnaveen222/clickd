@@ -1,4 +1,4 @@
-import { readSessionId, setSessionCookie } from "@/lib/session";
+import { readSessionId } from "@/lib/session";
 import { BUCKET, supabaseAdmin } from "@/lib/supabaseAdmin";
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
@@ -20,9 +20,7 @@ export async function POST(request: NextRequest) {
     if (!filename)
       return NextResponse.json({ error: "filename required" }, { status: 400 });
 
-    let sid = await readSessionId();
-    const createdNow = !sid;
-    if (!sid) sid = randomUUID();
+    const sid = await readSessionId();
 
     const path = `temp/${sid}/${randomUUID().slice(0, 8)}_${sanitize(
       filename
@@ -36,9 +34,8 @@ export async function POST(request: NextRequest) {
     const res = NextResponse.json({
       path: data.path,
       token: data.token,
-      expiresInSeconds: 7200,
+      expiresInSeconds: 7200, //unnecessary
     });
-    if (createdNow) await setSessionCookie(res, sid);
     return res;
   } catch (e: unknown) {
     return NextResponse.json(

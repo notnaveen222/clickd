@@ -3,13 +3,14 @@
 //handle currentStep in seperate function, detailed ifs
 //handle number of photos uploaded, if quantity multiple, then check if enough photos uploaded for one strip, or for full quantity
 //handle multiple of 4 photo upload even tho quantity set to 1
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Package } from "lucide-react";
 import Script from "next/script";
 import LayoutPage from "./components/LayoutForm";
 import PhotosPage from "./components/PhotosForm";
 import ShippingDetailsPage from "./components/ShippingDetails";
+import { supabase } from "@/lib/supabase";
 
 export interface layout {
   id: string;
@@ -103,6 +104,7 @@ export default function Order() {
         const msg = await res.text();
         throw new Error(msg || "Failed to create order");
       }
+      const client_order_id = data.client_order_id;
       const PaymentData: RazorpayOptions = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount: data.amount,
@@ -125,7 +127,10 @@ export default function Order() {
             const v = await fetch("/api/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(resp),
+              body: JSON.stringify({
+                ...resp,
+                client_order_id: client_order_id,
+              }),
             });
             const vr = await v.json();
             if (vr.ok) {
@@ -201,7 +206,34 @@ export default function Order() {
   //   // Clear the file input so selecting the same files again still triggers onChange
   //   event.target.value = "";
   // };
-
+  const uploadImagesToSupabase = async () => {
+    await Promise.all(
+      photos.map(async (file) => {
+        try {
+          const res = await fetch("/api/storage/signed-upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ filename: file.name }),
+          });
+          if (!res.ok) {
+            throw new Error("signed-upload failed");
+          }
+          const json = await res.json();
+          const { path, token } = json;
+          const { error } = await supabase.storage
+            .from("order-photos")
+            .uploadToSignedUrl(path, token, file, { contentType: file.type });
+          if (error) throw error;
+        } catch (error) {
+          console.error("Upload to supabase bucket failed", error);
+        }
+      })
+    );
+  };
+  useEffect(() => {
+    fetch("/api/session/init").catch(() => {});
+  }, []);
   return (
     <div className="mb-10 mt-4 ">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -351,6 +383,7 @@ export default function Order() {
                       : 0;
                     if (photos.length === required) {
                       setCurrentStep(currentStep + 1);
+                      uploadImagesToSupabase();
                     }
                   }}
                   className={`${

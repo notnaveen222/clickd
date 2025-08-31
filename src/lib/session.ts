@@ -8,7 +8,11 @@ export async function readSessionId() {
   return jar.get(SESSION_COOKIE)?.value;
 }
 
-export async function setSessionCookie(res: NextResponse, sid: string) {
+export async function setNewSessionCookie(res: NextResponse, sid: string) {
+  const jar = await cookies();
+  if (jar.get(SESSION_COOKIE)) {
+    jar.delete(SESSION_COOKIE);
+  }
   res.cookies.set({
     name: SESSION_COOKIE,
     value: sid,
@@ -16,6 +20,5 @@ export async function setSessionCookie(res: NextResponse, sid: string) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    // maxAge: 60 * 60 * 24, // optional: 1 day
   });
 }

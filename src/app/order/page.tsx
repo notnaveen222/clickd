@@ -75,13 +75,13 @@ export default function Order() {
   // const [uploadHint, setUploadHint] = useState<string | null>(null);
   const { register, handleSubmit } = useForm<FormFields>({
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zipcode: "",
+      name: "sample",
+      email: "sample",
+      phone: "sample",
+      address: "sample",
+      city: "sample",
+      state: "sample",
+      zipcode: "sample",
       additional_instructions: "",
     },
   });
@@ -207,7 +207,7 @@ export default function Order() {
   //   event.target.value = "";
   // };
   const uploadImagesToSupabase = async () => {
-    await Promise.all(
+    return Promise.all(
       photos.map(async (file) => {
         try {
           const res = await fetch("/api/storage/signed-upload", {
@@ -377,13 +377,13 @@ export default function Order() {
               )}
               {currentStep == 3 && (
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     const required = selectedLayout?.photos
                       ? selectedLayout.photos * quantity
                       : 0;
                     if (photos.length === required) {
                       setCurrentStep(currentStep + 1);
-                      uploadImagesToSupabase();
+                      await uploadImagesToSupabase();
                     }
                   }}
                   className={`${
@@ -403,7 +403,7 @@ export default function Order() {
                   onClick={() => setPaymentProcessing(true)}
                 >
                   {paymentProcessing
-                    ? "Processing Payment"
+                    ? "Initiating Payment..."
                     : "Pay & Place Order"}
                 </button>
               )}

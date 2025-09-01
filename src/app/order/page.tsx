@@ -11,6 +11,7 @@ import LayoutPage from "./components/LayoutForm";
 import PhotosPage from "./components/PhotosForm";
 import ShippingDetailsPage from "./components/ShippingDetails";
 import { supabase } from "@/lib/supabase";
+import { setNewSessionCookie } from "@/lib/session";
 
 export interface layout {
   id: string;
@@ -85,7 +86,9 @@ export default function Order() {
       additional_instructions: "",
     },
   });
-  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [imagesUploaded, setImagesUploaded] = useState<boolean>(false);
   const onSubmit = async (values: FormFields) => {
     try {
       const res = await fetch("/api/create-order", {
@@ -231,9 +234,11 @@ export default function Order() {
       })
     );
   };
-  useEffect(() => {
-    fetch("/api/session/init").catch(() => {});
-  }, []);
+  async function setNewSessionId() {
+    const res = await fetch("/api/session/init", { method: "POST" });
+    if (!res.ok) throw new Error("Failed to rotate session id");
+  }
+
   return (
     <div className="mb-10 mt-4 ">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -377,18 +382,27 @@ export default function Order() {
               )}
               {currentStep == 3 && (
                 <button
+                  disabled={
+                    isUploading ||
+                    photos.length !== (selectedLayout?.photos ?? 0) * quantity
+                  }
                   onClick={async () => {
-                    const required = selectedLayout?.photos
-                      ? selectedLayout.photos * quantity
-                      : 0;
-                    if (photos.length === required) {
-                      setCurrentStep(currentStep + 1);
-                      uploadImagesToSupabase()
-                        .then(() => console.log("Images Uploaded Successfully"))
-                        .catch((err) => {
-                          console.error("Image Upload Failed", err);
-                        });
+                    if (isUploading) return;
+
+                    setIsUploading(true);
+                    setImagesUploaded(false);
+
+                    setCurrentStep(4);
+
+                    try {
+                      await setNewSessionId();
                       await uploadImagesToSupabase();
+                      setImagesUploaded(true);
+                    } catch (e) {
+                      console.error(e);
+                      setImagesUploaded(false);
+                    } finally {
+                      setIsUploading(false);
                     }
                   }}
                   className={`${
@@ -397,19 +411,22 @@ export default function Order() {
                       : "bg-brand-blue/75 cursor-default"
                   } transition-all duration-200 rounded-lg text-white font-semibold py-2 mt-4`}
                 >
-                  Proceed to Checkout
+                  {isUploading ? "Uploading..." : "Proceed to Checkout"}
                 </button>
               )}
               {currentStep == 4 && (
                 <button
                   type="submit"
                   form="order-form"
+                  disabled={!imagesUploaded}
                   className="bg-brand-blue hover:bg-brand-blue transition-all duration-200 rounded-lg text-white font-semibold cursor-pointer py-2"
                   onClick={() => setPaymentProcessing(true)}
                 >
-                  {paymentProcessing
-                    ? "Initiating Payment..."
-                    : "Pay & Place Order"}
+                  {imagesUploaded
+                    ? paymentProcessing
+                      ? "Initiating Payment..."
+                      : "Pay & Place Order"
+                    : "Uploading Images..."}
                 </button>
               )}
               {currentStep > 1 && (

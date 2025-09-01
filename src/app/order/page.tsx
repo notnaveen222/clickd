@@ -382,8 +382,13 @@ export default function Order() {
                       ? selectedLayout.photos * quantity
                       : 0;
                     if (photos.length === required) {
-                      await uploadImagesToSupabase();
                       setCurrentStep(currentStep + 1);
+                      uploadImagesToSupabase()
+                        .then(() => console.log("Images Uploaded Successfully"))
+                        .catch((err) => {
+                          console.error("Image Upload Failed", err);
+                        });
+                      await uploadImagesToSupabase();
                     }
                   }}
                   className={`${

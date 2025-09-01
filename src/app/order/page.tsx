@@ -3,7 +3,7 @@
 //handle currentStep in seperate function, detailed ifs
 //handle number of photos uploaded, if quantity multiple, then check if enough photos uploaded for one strip, or for full quantity
 //handle multiple of 4 photo upload even tho quantity set to 1
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Package } from "lucide-react";
 import Script from "next/script";
@@ -11,7 +11,8 @@ import LayoutPage from "./components/LayoutForm";
 import PhotosPage from "./components/PhotosForm";
 import ShippingDetailsPage from "./components/ShippingDetails";
 import { supabase } from "@/lib/supabase";
-import { setNewSessionCookie } from "@/lib/session";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { orderSchema } from "@/lib/zod";
 
 export interface layout {
   id: string;
@@ -53,7 +54,7 @@ export type FormFields = {
   state: string;
   zipcode: string;
   phone: string;
-  additional_instructions: string | null;
+  additional_instructions?: string | undefined;
 };
 
 declare global {
@@ -74,23 +75,41 @@ export default function Order() {
   );
   const [photos, setPhotos] = useState<File[]>([]);
   // const [uploadHint, setUploadHint] = useState<string | null>(null);
-  const { register, handleSubmit } = useForm<FormFields>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setFocus,
+    trigger,
+  } = useForm<FormFields>({
+    resolver: zodResolver(orderSchema),
+    mode: "onBlur",
+    reValidateMode: "onChange",
     defaultValues: {
-      name: "sample",
-      email: "sample",
-      phone: "sample",
-      address: "sample",
-      city: "sample",
-      state: "sample",
-      zipcode: "sample",
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipcode: "",
       additional_instructions: "",
     },
   });
-  const [paymentProcessing, setPaymentProcessing] = useState<boolean>(false);
+  const [paymentStage, setPaymentStage] = useState<
+    "idle" | "initiating" | "processing"
+  >("idle");
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imagesUploaded, setImagesUploaded] = useState<boolean>(false);
   const onSubmit = async (values: FormFields) => {
+    // Only proceed if we're actually on step 4 and user clicked payment button
+    if (currentStep !== 4 || paymentStage !== "idle") {
+      console.log("Form submission blocked:", { currentStep, paymentStage });
+      return;
+    }
+
     try {
+      setPaymentStage("initiating");
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,10 +124,13 @@ export default function Order() {
       const data = await res.json();
       if (!res.ok) {
         const msg = await res.text();
+        setPaymentStage("idle"); // Reset payment stage on error
         throw new Error(msg || "Failed to create order");
       }
       const client_order_id = data.client_order_id;
-      const PaymentData: RazorpayOptions = {
+      const PaymentData: RazorpayOptions & {
+        modal?: { ondismiss?: () => void };
+      } = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount: data.amount,
         currency: data.currency,
@@ -123,10 +145,11 @@ export default function Order() {
         notes: {
           layout: selectedLayout!.name,
           qty: String(quantity),
-          orderId: String(data.orderId), // your internal id
+          orderId: String(data.orderId), // internal big id
         },
         handler: async function (resp: RazorpayResponse) {
           try {
+            setPaymentStage("processing");
             const v = await fetch("/api/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -143,16 +166,27 @@ export default function Order() {
             }
           } catch (e) {
             console.error(e);
+            setPaymentStage("idle"); // Reset payment stage on error
             alert("Verification failed. Please contact support.");
           }
+        },
+        modal: {
+          ondismiss: () => {
+            // User closed the Razorpay modal
+            setPaymentStage("idle");
+          },
         },
       };
       const rzp = new window.Razorpay(PaymentData);
       rzp.open();
       // const data = await res.json();
       // console.log("Order created:", data);
+      rzp.on?.("payment.failed", () => {
+        setPaymentStage("idle");
+      });
     } catch (error) {
       console.error(error);
+      setPaymentStage("idle"); // Reset payment stage on any error
     }
   };
 
@@ -295,6 +329,7 @@ export default function Order() {
               register={register}
               handleSubmit={handleSubmit}
               onSubmit={onSubmit}
+              errors={errors}
             />
           )}
         </div>
@@ -398,6 +433,7 @@ export default function Order() {
                       await setNewSessionId();
                       await uploadImagesToSupabase();
                       setImagesUploaded(true);
+                      setPaymentStage("idle"); // Ensure payment stage is reset
                     } catch (e) {
                       console.error(e);
                       setImagesUploaded(false);
@@ -418,15 +454,26 @@ export default function Order() {
                 <button
                   type="submit"
                   form="order-form"
-                  disabled={!imagesUploaded}
-                  className="bg-brand-blue hover:bg-brand-blue transition-all duration-200 rounded-lg text-white font-semibold cursor-pointer py-2"
-                  onClick={() => setPaymentProcessing(true)}
+                  disabled={
+                    !imagesUploaded ||
+                    Object.keys(errors).length > 0 ||
+                    paymentStage !== "idle"
+                  }
+                  className={`transition-all duration-200 rounded-lg text-white font-semibold py-2 ${
+                    !imagesUploaded ||
+                    Object.keys(errors).length > 0 ||
+                    paymentStage !== "idle"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-brand-blue hover:bg-brand-blue cursor-pointer"
+                  }`}
                 >
-                  {imagesUploaded
-                    ? paymentProcessing
-                      ? "Initiating Payment..."
-                      : "Pay & Place Order"
-                    : "Uploading Images..."}
+                  {!imagesUploaded
+                    ? "Uploading Images..."
+                    : paymentStage === "initiating"
+                    ? "Initiating Payment..."
+                    : paymentStage === "processing"
+                    ? "Processing Payment..."
+                    : "Pay & Place Order"}
                 </button>
               )}
               {currentStep > 1 && (

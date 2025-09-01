@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           status: "FAILED",
         };
     if (verified && sid) {
-      confirmUploadedPhotos({
+      await confirmUploadedPhotos({
         sessionId: sid,
         clientOrderId: client_order_id,
       });

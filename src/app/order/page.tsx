@@ -382,8 +382,8 @@ export default function Order() {
                       ? selectedLayout.photos * quantity
                       : 0;
                     if (photos.length === required) {
-                      setCurrentStep(currentStep + 1);
                       await uploadImagesToSupabase();
+                      setCurrentStep(currentStep + 1);
                     }
                   }}
                   className={`${

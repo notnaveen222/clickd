@@ -59,40 +59,18 @@ export async function confirmUploadedPhotos({
           continue;
         }
         movedFiles.push(targetPath);
-        // const sourcePath = `temp/${sessionId}/${file.name}`;
-        // const targetPath = `orders/${clientOrderId}/${file.name}`;
-        // // Copy file to new location
-        // const { error: copyError } = await supabaseAdmin.storage
-        //   .from(BUCKET)
-        //   .copy(sourcePath, targetPath);
-        // if (copyError) {
-        //   console.error(`Error copying ${file.name}:`, copyError);
-        //   errors.push(`Failed to copy ${file.name}: ${copyError.message}`);
-        //   continue;
-        // }
-        // // Delete file from temp location
-        // const { error: deleteError } = await supabaseAdmin.storage
-        //   .from(BUCKET)
-        //   .remove([sourcePath]);
-        // if (deleteError) {
-        //   console.error(`Error deleting temp file ${file.name}:`, deleteError);
-        //   // Don't fail the whole operation if cleanup fails
-        // }
-        // movedFiles.push(targetPath);
-        // console.log(`Successfully moved ${file.name} to ${targetPath}`);
       } catch (fileError) {
         console.error(`Error processing file ${file.name}:`, fileError);
         errors.push(`Failed to process ${file.name}`);
       }
     }
-    //console.log(`Files Confirmed: ${movedFiles.length}`);
 
-    // 4. Clean up empty temp folder
-    try {
-      await supabaseAdmin.storage.from(BUCKET).remove([`temp/${sessionId}`]);
-    } catch (cleanupError) {
-      console.error("Error cleaning up temp folder:", cleanupError);
-    }
+    // // 4. Clean up empty temp folder
+    // try {
+    //   await supabaseAdmin.storage.from(BUCKET).remove([`temp/${sessionId}`]);
+    // } catch (cleanupError) {
+    //   console.error("Error cleaning up temp folder:", cleanupError);
+    // }
 
     return {
       success: true,

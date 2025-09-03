@@ -24,7 +24,7 @@ export default function ShippingDetailsPage({
         <div className="">Shipping Information</div>
       </div>
       <form action="" id="order-form" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-x-10 gap-y-5">
+        <div className="grid grid-cols-2 gap-x-3 sm:gap-x-10 gap-y-5">
           <div className=" w-full">
             <div className=" font-semibold mb-1">Full Name</div>
             <input

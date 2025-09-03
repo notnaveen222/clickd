@@ -1,3 +1,5 @@
+import DownloadImagesButton from "@/components/DownloadImagesButton";
+import DownloadImageButton from "@/components/DownloadImagesButton";
 import OrderShippedButton from "@/components/OrderShippedButton";
 import { getUnshippedOrders } from "@/lib/supabase-actions";
 import { Order } from "@/types/order";
@@ -130,6 +132,7 @@ export default async function OrdersPage() {
               </div>
               {/* Optional actions */}
               <div className="mt-4 flex justify-end gap-2">
+                <DownloadImagesButton clientOrderId={o.client_order_id!} />
                 <OrderShippedButton
                   id={o.client_order_id!}
                   toEmail={o.email!}

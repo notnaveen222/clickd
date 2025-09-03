@@ -11,6 +11,8 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@supabase/supabase-js": "^2.56.0",
+    "archiver": "^7.0.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.541.0",
     "next": "15.5.0",
     "nodemailer": "^7.0.6",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/archiver": "^6.0.3",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.1",
     "@types/react": "^19",

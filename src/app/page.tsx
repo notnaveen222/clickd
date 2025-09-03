@@ -3,6 +3,7 @@ import ProcessBox from "@/components/ProcessBox";
 import FaqBox from "@/components/FaqBox";
 import Footer from "@/components/Footer";
 import RouterButton from "@/components/router-button";
+import stripImage from "../../public/layouts/4photostrip.png";
 
 export default function Home() {
   const processDescriptions = [
@@ -35,15 +36,19 @@ export default function Home() {
           <div className="flex relative">
             <Image
               className="h-96 relative left-[43px] -bottom-9 rotate-z-[9deg] w-fit"
-              src="/layouts/4photostrip.png"
+              src={stripImage}
               alt="strip"
+              priority
+              placeholder="blur"
               height={1135}
               width={378}
             />
             <Image
               className="absolute -bottom-5  -left-10 -rotate-z-[10deg] h-96 w-fit"
-              src="/layouts/4photostrip.png"
+              src={stripImage}
               alt="strip"
+              priority
+              placeholder="blur"
               height={1135}
               width={378}
             />

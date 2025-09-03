@@ -1,5 +1,8 @@
 import { Image as ImageIcon } from "lucide-react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
+
+import strip1x3 from "../../../../public/layouts/3photostrip.png";
+import strip1x4 from "../../../../public/layouts/4photostrip.png";
 
 interface layout {
   id: string;
@@ -7,7 +10,7 @@ interface layout {
   photos: number;
   description: string;
   price: number;
-  image_url: string;
+  image_url: StaticImageData;
 }
 
 export const stripLayouts = [
@@ -17,7 +20,7 @@ export const stripLayouts = [
     photos: 3,
     description: "3 Photos in classic strip format, ",
     price: 179,
-    image_url: "/layouts/3photostrip.png",
+    image_url: strip1x3,
   },
   {
     id: "1x4",
@@ -25,7 +28,7 @@ export const stripLayouts = [
     photos: 4,
     description: "4 Photos in classic strip format, ",
     price: 199,
-    image_url: "/layouts/4photostrip.png",
+    image_url: strip1x4,
   },
 ];
 
@@ -62,6 +65,8 @@ export default function LayoutPage({
                 alt="Layout Image"
                 width={150}
                 height={250}
+                priority
+                placeholder="blur"
               />
             </div>
             <h3 className="font-semibold text-gray-900">{layout.name}</h3>

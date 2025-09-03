@@ -30,11 +30,11 @@ interface RazorpayPrefill {
 
 export interface RazorpayOptions {
   key: string; // Live/Test key_id
-  amount: number; // in paise
-  currency: string; // e.g. "INR"
+  amount: number;
+  currency: string;
   name?: string;
   description?: string;
-  order_id: string; // from your server
+  order_id: string; // from  server
   prefill?: RazorpayPrefill;
   notes?: Record<string, string>;
   handler?: (resp: RazorpayResponse) => void;
@@ -101,13 +101,21 @@ export default function Order() {
   >("idle");
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imagesUploaded, setImagesUploaded] = useState<boolean>(false);
+  const [imageUploadError, setImageUploadError] = useState<boolean>(false);
   const onSubmit = async (values: FormFields) => {
-    // Only proceed if we're actually on step 4 and user clicked payment button
     if (currentStep !== 4 || paymentStage !== "idle") {
       console.log("Form submission blocked:", { currentStep, paymentStage });
       return;
     }
-
+    const layoutForServer = selectedLayout
+      ? (({ id, name, photos, description, price }) => ({
+          id,
+          name,
+          photos,
+          description,
+          price,
+        }))(selectedLayout)
+      : null;
     try {
       setPaymentStage("initiating");
       const res = await fetch("/api/create-order", {
@@ -115,18 +123,18 @@ export default function Order() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...values,
-          layout: selectedLayout,
+          layout: layoutForServer,
           quantity: quantity,
           status: "ORDER_CREATED",
           razorpay_order_id: "init",
         }),
       });
-      const data = await res.json();
       if (!res.ok) {
         const msg = await res.text();
         setPaymentStage("idle"); // Reset payment stage on error
         throw new Error(msg || "Failed to create order");
       }
+      const data = await res.json();
       const client_order_id = data.client_order_id;
       const PaymentData: RazorpayOptions & {
         modal?: { ondismiss?: () => void };
@@ -262,8 +270,10 @@ export default function Order() {
             .from("order-photos")
             .uploadToSignedUrl(path, token, file, { contentType: file.type });
           if (error) throw error;
-        } catch (error) {
-          console.error("Upload to supabase bucket failed", error);
+        } catch (err) {
+          throw new Error(
+            `Upload failed: ${err instanceof Error ? err.message : String(err)}`
+          );
         }
       })
     );
@@ -426,19 +436,23 @@ export default function Order() {
 
                     setIsUploading(true);
                     setImagesUploaded(false);
-
+                    setImageUploadError(false);
                     setCurrentStep(4);
 
                     try {
                       await setNewSessionId();
-                      await uploadImagesToSupabase();
-                      setImagesUploaded(true);
-                      setPaymentStage("idle"); // Ensure payment stage is reset
+                      try {
+                        const res = await uploadImagesToSupabase();
+                        setImagesUploaded(true);
+                      } catch (error) {
+                        console.error(error);
+                        setImageUploadError(true);
+                      }
                     } catch (e) {
                       console.error(e);
-                      setImagesUploaded(false);
                     } finally {
                       setIsUploading(false);
+                      setPaymentStage("idle"); // Ensure payment stage is reset
                     }
                   }}
                   className={`${
@@ -457,7 +471,8 @@ export default function Order() {
                   disabled={
                     !imagesUploaded ||
                     Object.keys(errors).length > 0 ||
-                    paymentStage !== "idle"
+                    paymentStage !== "idle" ||
+                    imageUploadError
                   }
                   className={`transition-all duration-200 rounded-lg text-white font-semibold py-2 ${
                     !imagesUploaded ||
@@ -469,6 +484,8 @@ export default function Order() {
                 >
                   {!imagesUploaded
                     ? "Uploading Images..."
+                    : imageUploadError
+                    ? "Upload Failed, Go back & Try Again"
                     : paymentStage === "initiating"
                     ? "Initiating Payment..."
                     : paymentStage === "processing"

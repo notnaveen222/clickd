@@ -10,7 +10,7 @@ export default async function FailurePage({
   const orderId = params.orderId ?? "";
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center grow">
       <div className="bg-red-600 flex flex-col items-center rounded-xl py-10 px-10 text-white">
         <Image
           src="/cross.png"

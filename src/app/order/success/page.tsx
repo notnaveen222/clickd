@@ -9,7 +9,7 @@ export default async function SuccessPage({
   const orderId = params.orderId ?? "";
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex  items-center justify-center grow">
       <div className="bg-green-500 flex flex-col items-center rounded-xl py-10 px-10 text-white">
         <Image
           src="/check.png"

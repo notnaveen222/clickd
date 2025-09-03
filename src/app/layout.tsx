@@ -23,7 +23,9 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/film-strip.png" />
       </head>
-      <body className={`${geistSans.variable}  antialiased`}>
+      <body
+        className={`${geistSans.variable}  antialiased flex min-h-svh flex-col`}
+      >
         <Navbar />
         {children}
       </body>

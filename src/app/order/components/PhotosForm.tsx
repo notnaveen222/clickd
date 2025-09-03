@@ -64,12 +64,12 @@ export default function PhotosPage({
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div
-              className={`border rounded-lg p-6 cursor-pointer transition-all  text-center  ${
+              className={`border rounded-lg p-6 bg-gray-100 cursor-pointer transition-all  text-center  ${
                 photoMethod === "take"
                   ? "border-[#1980E5] bg-blue-50"
                   : "border-gray-200"
               }`}
-              onClick={() => setPhotoMethod("take")}
+              // onClick={() => setPhotoMethod("take")}
             >
               <Camera className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
               <div className=" text-xl font-semibold mb-2 text-gray-900">

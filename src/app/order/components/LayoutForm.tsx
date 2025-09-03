@@ -10,7 +10,7 @@ interface layout {
   image_url: string;
 }
 
-const stripLayouts = [
+export const stripLayouts = [
   {
     id: "1x3",
     name: "Photostrip (3 Photos)",

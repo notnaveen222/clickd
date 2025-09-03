@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { generateClientOrderId } from "@/lib/supabase-actions";
+import { serverOrderSchema } from "@/lib/zod";
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
@@ -13,6 +14,16 @@ const razorpay = new Razorpay({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const parsed = serverOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid order data",
+          details: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 }
+      );
+    }
     const { layout, quantity } = body;
     const total_inr_rs = Number(layout.price) * Number(quantity);
     const client_order_id = await generateClientOrderId();

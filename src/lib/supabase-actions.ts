@@ -86,3 +86,28 @@ export async function confirmUploadedPhotos({
     };
   }
 }
+
+const COLUMNS =
+  "id,client_order_id, name, email, address, city, state, zipcode, phone, status, total_inr, created_at";
+
+export async function getUnshippedOrders() {
+  const { data, error, count } = await supabaseAdmin
+    .from("orders")
+    .select(COLUMNS, { count: "exact" })
+    .is("shipped", false) // or .eq("undelivered", true)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return { orders: data ?? [], total: count ?? 0 };
+}
+
+export async function markOrderShipped(id: string) {
+  const { error } = await supabaseAdmin
+    .from("orders")
+    .update({ shipped: true })
+    .eq("client_order_id", id);
+  if (error) {
+    return { ok: false as const };
+  }
+  return { ok: true as const };
+}

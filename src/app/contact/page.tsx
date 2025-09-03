@@ -3,7 +3,7 @@ import { Mail, Phone, UserRound } from "lucide-react";
 export default function ContactPage() {
   return (
     <>
-      <div className="flex grow justify-center items-center">
+      <div className="flex grow justify-center items-center pt-2 sm:pt-0 mb-10 mb-0">
         <div className="border border-gray-200 gap-y-2 p-5 mx-5 flex flex-col items-center rounded-xl shadow-md">
           <UserRound className="w-10 h-10 " />
 
@@ -48,9 +48,12 @@ export default function ContactPage() {
                   <div className="font-medium underline underline-offset-1"></div>
                 </div>
                 <div className="flex gap-x-2 items-center">
-                  <div className="font-medium underline underline-offset-1">
+                  <a
+                    href="mailto:clickd.ofc@gmail.com"
+                    className="font-medium underline underline-offset-1"
+                  >
                     clickd.ofc@gmail.com
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>

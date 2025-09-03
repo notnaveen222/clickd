@@ -24,8 +24,8 @@ export default function ShippingDetailsPage({
         <div className="">Shipping Information</div>
       </div>
       <form action="" id="order-form" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-x-3 sm:gap-x-10 gap-y-5">
-          <div className=" w-full">
+        <div className="grid  grid-cols-2 gap-x-3 sm:gap-x-10 gap-y-5">
+          <div className=" w-full col-span-2 sm:col-span-1">
             <div className=" font-semibold mb-1">Full Name</div>
             <input
               type="text"
@@ -43,7 +43,7 @@ export default function ShippingDetailsPage({
               </span>
             )}
           </div>
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <div className=" font-semibold mb-1">Email</div>
             <input
               type="text"
@@ -115,7 +115,7 @@ export default function ShippingDetailsPage({
               </span>
             )}
           </div>
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <div className=" font-semibold mb-1">Zip Code</div>
             <input
               type="text"
@@ -133,8 +133,8 @@ export default function ShippingDetailsPage({
               </span>
             )}
           </div>
-          <div>
-            <div className=" font-semibold mb-1">Phone Number</div>
+          <div className="col-span-2 sm:col-span-1">
+            <div className=" font-semibold mb-1 ">Phone Number</div>
             <input
               type="text"
               className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${

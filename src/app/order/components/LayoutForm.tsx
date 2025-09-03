@@ -18,7 +18,7 @@ export const stripLayouts = [
     id: "1x3",
     name: "Photostrip (3 Photos)",
     photos: 3,
-    description: "3 Photos in classic strip format, ",
+    description: "3 Photos in a classic strip format ",
     price: 179,
     image_url: strip1x3,
   },
@@ -26,7 +26,7 @@ export const stripLayouts = [
     id: "1x4",
     name: "Photostrip (4 Photos)",
     photos: 4,
-    description: "4 Photos in classic strip format, ",
+    description: "4 Photos in a classic strip format ",
     price: 199,
     image_url: strip1x4,
   },
@@ -52,7 +52,7 @@ export default function LayoutPage({
         {stripLayouts.map((layout) => (
           <div
             key={layout.id}
-            className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+            className={`border rounded-lg p-2 md:p-4 cursor-pointer transition-all hover:shadow-md ${
               selectedLayout?.id === layout.id
                 ? "border-[#1980E5] bg-blue-50"
                 : "border-gray-200"
@@ -76,7 +76,7 @@ export default function LayoutPage({
                 ₹{layout.price}
               </div>
               {selectedLayout?.id === layout.id && (
-                <div className="bg-[#1980E5] font-semibold px-2 rounded-md text-white">
+                <div className="bg-[#1980E5] font-semibold px-2 text-sm rounded-md text-white">
                   Selected
                 </div>
               )}

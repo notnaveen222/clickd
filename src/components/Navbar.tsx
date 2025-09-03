@@ -5,7 +5,7 @@ import RouterButton from "./router-button";
 export default function Navbar() {
   const router = useRouter();
   return (
-    <div className="w-full h-[80px] border-b border-b-black/15 flex items-center justify-between px-10">
+    <div className="w-full h-[80px] border-b border-b-black/15 flex items-center justify-center sm:justify-between px-7 sm:px-10  ">
       <Image
         onClick={() => router.push("/")}
         src="/clickd_navbar_logo.svg"

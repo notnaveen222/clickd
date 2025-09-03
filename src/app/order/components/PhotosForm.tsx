@@ -15,6 +15,7 @@ const IMAGE_FORMAT_ALLOWED = [
 export default function PhotosPage({
   selectedLayout,
   currentStep,
+  setCurrentStep,
   quantity,
   photos,
   setPhotos,
@@ -23,6 +24,7 @@ export default function PhotosPage({
 }: {
   selectedLayout: layout | null;
   currentStep: number;
+  setCurrentStep: (step: number) => void;
   quantity: number;
   photoMethod: "take" | "upload" | null;
   photos: File[];
@@ -41,7 +43,7 @@ export default function PhotosPage({
     });
 
     if (valid.length === 0) return;
-    const targetTotal = selectedLayout.photos * Math.max(1, quantity || 1);
+    const targetTotal = selectedLayout.photos;
 
     // push immediately to UI (capped to targetTotal)
     setPhotos((prev) => {
@@ -65,12 +67,15 @@ export default function PhotosPage({
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div
-              className={`border rounded-lg p-6  cursor-pointer transition-all  text-center  ${
+              className={`border rounded-lg p-6  cursor-pointer transition-all  text-center hover:shadow-md ${
                 photoMethod === "take"
                   ? "border-[#1980E5] bg-blue-50"
                   : "border-gray-200"
               }`}
-              onClick={() => setPhotoMethod("take")}
+              onClick={() => {
+                setCurrentStep(3);
+                setPhotoMethod("take");
+              }}
             >
               <Camera className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
               <div className=" text-xl font-semibold mb-2 text-gray-900">
@@ -86,7 +91,10 @@ export default function PhotosPage({
                   ? "border-[#1980E5] bg-blue-50"
                   : "border-gray-200"
               }`}
-              onClick={() => setPhotoMethod("upload")}
+              onClick={() => {
+                setCurrentStep(3);
+                setPhotoMethod("upload");
+              }}
             >
               <Upload className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
               <div className="text-xl font-semibold mb-2 text-gray-900">
@@ -151,7 +159,7 @@ export default function PhotosPage({
           {photos.length > 0 && (
             <div className="mt-4">
               <h4 className="font-semibold mb-2 text-gray-900">
-                Photos ({photos.length}/{selectedLayout!.photos * quantity})
+                Photos ({photos.length}/{selectedLayout!.photos})
               </h4>
               <div className="grid grid-cols-3 gap-2">
                 {photos.map((file, index) => {
@@ -181,6 +189,12 @@ export default function PhotosPage({
                         className="absolute cursor-pointer top-1 right-1 bg-black/50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
                       >
                         ✕
+                      </button>
+                      <button
+                        type="button"
+                        className="absolute cursor-pointer top-1 left-1 bg-brand-blue text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
+                      >
+                        {index + 1}
                       </button>
                     </div>
                   );

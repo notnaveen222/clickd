@@ -299,8 +299,7 @@ export default function TakePhotosPane({
       <div className="text-gray-600 font-medium mb-4">
         We will auto-capture a photo every{" "}
         {Math.round(captureIntervalMs / 1000)} seconds until you reach{" "}
-        {selectedLayout.photos}×{Math.max(1, quantity)} = {targetTotal}{" "}
-        photo(s).
+        {selectedLayout.photos} photo(s).
       </div>
 
       {/* Preview */}

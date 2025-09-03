@@ -326,6 +326,7 @@ export default function Order() {
           {(currentStep == 2 || currentStep == 3) && (
             <PhotosPage
               selectedLayout={selectedLayout}
+              setCurrentStep={setCurrentStep}
               currentStep={currentStep}
               quantity={quantity}
               photoMethod={photoMethod}
@@ -423,18 +424,18 @@ export default function Order() {
               )}
               {currentStep == 2 && (
                 <button
-                  onClick={() => {
-                    if (photoMethod != null) {
-                      setCurrentStep(currentStep + 1);
-                    }
-                  }}
+                  // onClick={() => {
+                  //   if (photoMethod != null) {
+                  //     setCurrentStep(currentStep + 1);
+                  //   }
+                  // }}
                   className={`${
                     photoMethod
-                      ? "bg-brand-blue/100 cursor-pointer"
+                      ? "bg-brand-blue/100 "
                       : "bg-brand-blue/75 cursor-default"
                   }  transition-all duration-200 rounded-lg text-white font-semibold py-2`}
                 >
-                  Continue
+                  Choose an option
                 </button>
               )}
               {currentStep == 3 && (

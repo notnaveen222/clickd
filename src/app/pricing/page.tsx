@@ -11,7 +11,7 @@ export default function PricingPage() {
             pricing
           </div>
           <div className="text-sub-text font-medium mb-5">
-            A lot more coming soon
+            A lot more coming soon !!!
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  w-fit">
             {stripLayouts.map((layout) => (
@@ -35,7 +35,7 @@ export default function PricingPage() {
                   {layout.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <div className="bg-gray-100 text-gray-700 px-2 rounded-lg">
+                  <div className="bg-brand-blue text-white font-semibold px-2 rounded-lg">
                     ₹{layout.price}
                   </div>
                 </div>

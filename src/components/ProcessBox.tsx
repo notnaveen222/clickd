@@ -14,7 +14,7 @@ const icons = {
 
 const ProcessBox = ({ imageURL, title, description }: BoxProp) => {
   return (
-    <div className="w-[350px] md:w-[280px] lg:w-[350px] mt-10 rounded-3xl bg-surface-gray/50 px-3 h-[210px] md:h-[260px] py-8 gap-3 flex flex-col justify-center items-center">
+    <div className="w-[340px] md:w-[280px] lg:w-[350px] mt-10 rounded-3xl bg-surface-gray/50 px-3 h-[210px] md:h-[260px] py-8 gap-3 flex flex-col justify-center items-center">
       <div className="bg-brand-blue/30 p-2.5 rounded-full flex items-center justify-center">
         {icons[imageURL]}
       </div>

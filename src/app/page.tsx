@@ -31,11 +31,11 @@ export default function Home() {
   ];
   return (
     <>
-      <div className="flex flex-col-reverse md:flex mb-12 lg:mb-28  md:flex-row px-10 lg:px-[10vw] w-full mt-5">
-        <div className=" md:w-1/2 border overflow-hidden mb-5 sm:mb-0 flex justify-center border-black/15 rounded-2xl">
-          <div className="flex relative">
+      <div className="flex flex-col-reverse md:flex mb-12 lg:mb-28  md:flex-row px-5 lg:px-[10vw] w-full mt-5">
+        <div className=" md:w-1/2 border overflow-hidden mb-9 sm:mb-0 flex justify-center border-black/15  rounded-2xl">
+          <div className="flex relative ">
             <Image
-              className="h-96 relative left-[43px] -bottom-9 rotate-z-[9deg] w-fit"
+              className="h-96 relative left-[43px] -bottom-9 rotate-z-[9deg] w-fit shadow-xl shadow-black"
               src={stripImage}
               alt="strip"
               priority
@@ -44,7 +44,7 @@ export default function Home() {
               width={378}
             />
             <Image
-              className="absolute -bottom-5  -left-10 -rotate-z-[10deg] h-96 w-fit"
+              className="absolute -bottom-5  -left-10 -rotate-z-[10deg] h-96 w-fit shadow-xl shadow-black"
               src={stripImage}
               alt="strip"
               priority
@@ -55,7 +55,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-col mb-5 sm:mb-0 justify-center gap-4 md:w-1/2">
-          <div className="text-[55px]/15 font-bold text-center">
+          <div className="text-[55px]/15 font-bold text-center ">
             Photo Strips,
             <br /> delivered to your <br className="hidden sm:block" />
             door

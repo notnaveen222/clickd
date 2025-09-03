@@ -13,6 +13,7 @@ import ShippingDetailsPage from "./components/ShippingDetails";
 import { supabase } from "@/lib/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderSchema } from "@/lib/zod";
+import { StaticImageData } from "next/image";
 
 export interface layout {
   id: string;
@@ -20,7 +21,7 @@ export interface layout {
   photos: number;
   description: string;
   price: number;
-  image_url: string;
+  image_url: StaticImageData;
 }
 interface RazorpayPrefill {
   name?: string;

@@ -379,6 +379,17 @@ export default function Order() {
                       </select>
                     </div>
                   </div>
+                  {currentStep == 4 && (
+                    <div className="flex justify-between text-gray-700 font-semibold">
+                      <span>Delivery Fees</span>
+                      <span>
+                        <span className="mr-2 text-white bg-brand-blue px-2 pb-1 rounded-md">
+                          Free Delivery
+                        </span>
+                        <span className="font-semibold line-through">₹50</span>
+                      </span>
+                    </div>
+                  )}
                   <div className="border-t border-t-black/20 pt-4">
                     <div className="flex text-lg font-semibold justify-between items-center mb-4">
                       <div>Total</div>

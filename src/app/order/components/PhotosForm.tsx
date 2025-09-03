@@ -2,6 +2,7 @@
 import { layout } from "../page";
 import { Camera, Upload } from "lucide-react";
 import React from "react";
+import TakePhotosPane from "./TakePhotosPane";
 
 const IMAGE_FORMAT_ALLOWED = [
   "image/jpeg",
@@ -64,12 +65,12 @@ export default function PhotosPage({
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div
-              className={`border rounded-lg p-6 bg-gray-100 cursor-pointer transition-all  text-center  ${
+              className={`border rounded-lg p-6  cursor-pointer transition-all  text-center  ${
                 photoMethod === "take"
                   ? "border-[#1980E5] bg-blue-50"
                   : "border-gray-200"
               }`}
-              // onClick={() => setPhotoMethod("take")}
+              onClick={() => setPhotoMethod("take")}
             >
               <Camera className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
               <div className=" text-xl font-semibold mb-2 text-gray-900">
@@ -77,7 +78,6 @@ export default function PhotosPage({
               </div>
               <p className="text-sm text-gray-600">
                 Use your device camera to take photos directly
-                <span className="font-semibold block">(Available Soon)</span>
               </p>
             </div>
             <div
@@ -99,10 +99,17 @@ export default function PhotosPage({
           </div>
         </div>
       )}
-      {currentStep == 3 && (
+      {currentStep == 3 && selectedLayout && (
         <div>
-          {photoMethod == "take" ? (
-            <div>Take Photo</div>
+          {photoMethod === "take" ? (
+            <TakePhotosPane
+              selectedLayout={selectedLayout}
+              quantity={quantity}
+              photos={photos}
+              setPhotos={setPhotos}
+              captureIntervalMs={5000}
+              aspectRatio={null}
+            />
           ) : (
             <div className="border border-gray-200 p-5 transition-all duration-200 rounded-xl shadow-md ">
               <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
@@ -136,43 +143,51 @@ export default function PhotosPage({
                     </label>
                   </button>
                 </div>
-
-                {photos.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-2 text-gray-900">
-                      Uploaded Photos ({photos.length}/
-                      {selectedLayout!.photos * quantity})
-                    </h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {photos.map((file, index) => (
-                        <div
-                          key={index}
-                          className="aspect-square relative bg-gray-100 rounded border border-gray-200 flex items-center justify-center"
-                        >
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Uploaded ${index + 1}`}
-                            className="object-contain w-full h-full"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPhotos((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              )
-                            }
-                            className="absolute cursor-pointer top-1 right-1 bg-black/50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
-          )}{" "}
+          )}
+
+          {/* Shared Gallery for both upload & take */}
+          {photos.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-semibold mb-2 text-gray-900">
+                Photos ({photos.length}/{selectedLayout!.photos * quantity})
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {photos.map((file, index) => {
+                  const url = URL.createObjectURL(file);
+                  return (
+                    <div
+                      key={index}
+                      className="aspect-square relative bg-gray-100 rounded border border-gray-200 flex items-center justify-center"
+                    >
+                      <img
+                        src={url}
+                        alt={`Photo ${index + 1}`}
+                        className="object-contain w-full h-full"
+                        onLoad={(e) =>
+                          URL.revokeObjectURL(
+                            (e.target as HTMLImageElement).src
+                          )
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPhotos((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          )
+                        }
+                        className="absolute cursor-pointer top-1 right-1 bg-black/50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

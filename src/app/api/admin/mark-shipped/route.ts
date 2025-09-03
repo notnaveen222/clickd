@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+    //domain then enable
     // try {
     //   await sendShippedMail(toEmail, orderId);
     // } catch (error) {

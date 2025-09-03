@@ -93,12 +93,9 @@ export default async function OrdersPage() {
                   <Label>Email</Label>
                   <Value>
                     {o.email ? (
-                      <a
-                        href={`mailto:${o.email}`}
-                        className="underline decoration-gray-300 hover:decoration-gray-500"
-                      >
+                      <div className="underline decoration-gray-300 hover:decoration-gray-500">
                         {o.email}
-                      </a>
+                      </div>
                     ) : (
                       "—"
                     )}
@@ -109,12 +106,9 @@ export default async function OrdersPage() {
                   <Label>Phone</Label>
                   <Value>
                     {o.phone ? (
-                      <a
-                        href={`tel:${o.phone}`}
-                        className="underline decoration-gray-300 hover:decoration-gray-500"
-                      >
+                      <div className="underline decoration-gray-300 hover:decoration-gray-500">
                         {o.phone}
-                      </a>
+                      </div>
                     ) : (
                       "—"
                     )}

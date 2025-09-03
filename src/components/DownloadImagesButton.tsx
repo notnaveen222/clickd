@@ -48,7 +48,7 @@ export default function DownloadImagesButton({
       type="button"
       disabled={loading}
       onClick={handleDownload}
-      className="inline-flex items-center gap-2 rounded-lg cursor-pointer border px-3 py-1.5 text-sm font-semibold hover:bg-gray-50"
+      className="inline-flex items-center gap-2 rounded-lg cursor-pointer border px-3 py-1.5 text-sm font-semibold hover:bg-black transition-all duration-200 ease-in-out hover:text-white"
     >
       <Download size={16} />
       {loading ? "Preparing…" : "Download"}

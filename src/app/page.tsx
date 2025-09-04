@@ -4,6 +4,13 @@ import FaqBox from "@/components/FaqBox";
 import Footer from "@/components/Footer";
 import RouterButton from "@/components/router-button";
 import stripImage from "../../public/layouts/4photostrip.png";
+import HeroText from "@/components/home/HeroText";
+import {
+  FadeInAnimation,
+  FadeUpAnimation,
+  HoverImageScale,
+} from "@/components/motion-wrappers";
+import ProcessContainer from "@/components/home/Process";
 
 export default function Home() {
   const processDescriptions = [
@@ -32,66 +39,54 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col-reverse md:flex mb-12 lg:mb-28  md:flex-row px-5 lg:px-[10vw] w-full mt-5">
-        <div className=" md:w-1/2 border overflow-hidden mb-9 sm:mb-0 flex justify-center border-black/15  rounded-2xl">
+        <div className=" md:w-1/2 border opacity-0 fadeInAnimationCSSClass overflow-hidden mb-9 sm:mb-0 flex justify-center border-black/15  rounded-2xl">
           <div className="flex relative ">
-            <Image
-              className="h-96 relative left-[43px] -bottom-9 rotate-z-[9deg] w-fit shadow-xl shadow-black"
-              src={stripImage}
-              alt="strip"
-              priority
-              placeholder="blur"
-              height={1135}
-              width={378}
-            />
-            <Image
-              className="absolute -bottom-5  -left-10 -rotate-z-[10deg] h-96 w-fit shadow-xl shadow-black"
-              src={stripImage}
-              alt="strip"
-              priority
-              placeholder="blur"
-              height={1135}
-              width={378}
-            />
+            <FadeUpAnimation delay={0.3}>
+              <HoverImageScale>
+                <Image
+                  className="h-96 relative left-[43px] -bottom-9 rotate-z-[9deg] w-fit shadow-xl shadow-black"
+                  src={stripImage}
+                  alt="strip"
+                  priority
+                  placeholder="blur"
+                  height={1135}
+                  width={378}
+                />
+                <Image
+                  className="absolute -bottom-5  -left-10 -rotate-z-[10deg] h-96 w-fit shadow-xl shadow-black"
+                  src={stripImage}
+                  alt="strip"
+                  priority
+                  placeholder="blur"
+                  height={1135}
+                  width={378}
+                />
+              </HoverImageScale>
+            </FadeUpAnimation>
           </div>
         </div>
         <div className="flex flex-col mb-5 sm:mb-0 justify-center gap-4 md:w-1/2">
-          <div className="text-[55px]/15 font-bold text-center ">
-            Photo Strips,
-            <br /> delivered to your <br className="hidden sm:block" />
-            door
-          </div>
-          <RouterButton
-            styles="cursor-pointer text-white   bg-brand-blue/90 hover:bg-brand-blue hover:shadow-blue-500 hover:shadow-2xs transition-all duration-200 rounded-xl w-1/2 mx-auto py-2.5 flex items-center justify-center  font-bold text-2xl"
-            title="Order Now"
-            route="order"
-          />
+          <HeroText />
+          <FadeInAnimation delay={0.3}>
+            <RouterButton
+              styles="cursor-pointer text-white   bg-brand-blue/90 hover:bg-brand-blue hover:shadow-blue-500 hover:shadow-2xs transition-all duration-200 rounded-xl w-1/2 mx-auto py-2.5 flex items-center justify-center  font-bold text-2xl"
+              title="Order Now"
+              route="order"
+            />
+          </FadeInAnimation>
         </div>
       </div>
       <div className="flex flex-col lg:px-[15vw] w-full ">
-        <div className="text-center text-[36px] font-semibold">
-          How it works
-        </div>
-        <div className="text-center text-sub-text text-lg font-medium">
-          creating your custom photo strips is easy with our simple 3-step
-          process
-        </div>
-        <div className="flex mb-10 sm:mb-0 flex-col items-center md:items-baseline   md:flex-row justify-center md:gap-x-8 lg:gap-x-16">
-          <ProcessBox
-            imageURL="image"
-            title="1. Choose your images"
-            description={processDescriptions[0]}
-          />
-          <ProcessBox
-            imageURL="wand"
-            title="2. Customize Design"
-            description={processDescriptions[1]}
-          />
-          <ProcessBox
-            imageURL="truck"
-            title="3. Order and Recieve"
-            description={processDescriptions[2]}
-          />
-        </div>
+        <FadeInAnimation delay={0.4}>
+          <div className="text-center text-[36px] font-semibold">
+            How it works
+          </div>
+          <div className="text-center text-sub-text text-lg font-medium">
+            creating your custom photo strips is easy with our simple 3-step
+            process
+          </div>
+        </FadeInAnimation>
+        <ProcessContainer />
         <div className="text-center">
           <RouterButton
             styles="font-medium text-17 px-5 py-2 bg-[#D9D9D9]/70 hover:bg-[#D9D9D9] transition-all duration-150 my-8 rounded-full cursor-pointer"

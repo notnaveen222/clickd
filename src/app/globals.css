@@ -31,3 +31,18 @@ body {
 .blue-border:hover {
   border: 10px rgba(25, 128, 229, 1);
 }
+
+@layer utilities {
+  @keyframes fadeInCSS {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .fadeInAnimationCSSClass {
+    animation: fadeInCSS 0.2s linear 0.2s forwards;
+  }
+}

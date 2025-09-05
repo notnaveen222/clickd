@@ -11,6 +11,9 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Clickd",
   description: "Your 24/7 e-Photobooth",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({

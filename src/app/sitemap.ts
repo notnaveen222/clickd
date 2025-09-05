@@ -28,18 +28,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/order/success`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/order/failure`,
-      lastModified: new Date(),
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    },
+    // {
+    //   url: `${baseUrl}/order/success`,
+    //   lastModified: new Date(),
+    //   changeFrequency: "yearly" as const,
+    //   priority: 0.3,
+    // },
+    // {
+    //   url: `${baseUrl}/order/failure`,
+    //   lastModified: new Date(),
+    //   changeFrequency: "yearly" as const,
+    //   priority: 0.3,
+    // },
   ];
 
   // Dynamic routes for admin dashboard (if needed for SEO)

@@ -1,3 +1,4 @@
+import { sendShippedMail } from "@/lib/nodemailer-actions";
 import { markOrderShipped } from "@/lib/supabase-actions";
 import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
@@ -8,6 +9,18 @@ export async function POST(request: NextRequest) {
         message: "Order ID Required to mark it shipped",
       });
     }
+    try {
+      await sendShippedMail(toEmail, orderId);
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Marked shipped, but email failed to send",
+          error,
+        },
+        { status: 502 }
+      );
+    }
     const result = await markOrderShipped(orderId);
     if (!result?.ok) {
       return NextResponse.json(
@@ -16,23 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
     //domain then enable
-    // try {
-    //   await sendShippedMail(toEmail, orderId);
-    // } catch (error) {
-    //   return NextResponse.json(
-    //     {
-    //       ok: false,
-    //       message: "Marked shipped, but email failed to send",
-    //       error,
-    //     },
-    //     { status: 502 }
-    //   );
-    // }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json(
-      { ok: false, message: "Invalid JSON body" },
+      { ok: false, message: "Invalid JSON body", error: err },
       { status: 400 }
     );
   }

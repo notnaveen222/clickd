@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import crypto from "crypto";
 import { confirmUploadedPhotos } from "@/lib/supabase-actions";
 import { readSessionId } from "@/lib/session";
+import { sendConfirmationMail } from "@/lib/nodemailer-actions";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
       razorpay_payment_id,
       razorpay_signature,
       client_order_id,
+      email,
     } = await req.json();
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -48,10 +50,24 @@ export async function POST(req: NextRequest) {
           status: "FAILED",
         };
     if (verified && sid) {
-      await confirmUploadedPhotos({
+      const res = await confirmUploadedPhotos({
         sessionId: sid,
         clientOrderId: client_order_id,
       });
+      if (res.success) {
+        try {
+          await sendConfirmationMail(email, client_order_id);
+        } catch (error) {
+          return NextResponse.json(
+            {
+              ok: false,
+              message: "Order Confirmed, but confirmation email failed to send",
+              error,
+            },
+            { status: 502 }
+          );
+        }
+      }
     }
     const { error } = await supabase
       .from("orders")

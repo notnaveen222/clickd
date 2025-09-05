@@ -14,7 +14,7 @@ export default function OrderShippedButton({
     id: string;
     toEmail: string;
   }) => {
-    const res = await fetch("/api/admin/mark-shipped", {
+    await fetch("/api/admin/mark-shipped", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderId: id, toEmail: toEmail }),

@@ -79,9 +79,7 @@ export default function Order() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    setFocus,
-    trigger,
+    formState: { errors },
   } = useForm<FormFields>({
     resolver: zodResolver(orderSchema),
     mode: "onBlur",
@@ -165,6 +163,7 @@ export default function Order() {
               body: JSON.stringify({
                 ...resp,
                 client_order_id: client_order_id,
+                email: values.email,
               }),
             });
             const vr = await v.json();
@@ -455,7 +454,7 @@ export default function Order() {
                     try {
                       await setNewSessionId();
                       try {
-                        const res = await uploadImagesToSupabase();
+                        await uploadImagesToSupabase();
                         setImagesUploaded(true);
                       } catch (error) {
                         console.error(error);

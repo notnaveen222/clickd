@@ -24,6 +24,9 @@ export default async function SuccessPage({
         <div className="font-semibold w-10/12 text-center mb-1">
           {"We've received your order, will be shipped in 3-5 business days."}
         </div>
+        <div className="font-semibold w-10/12 text-center mb-1">
+          {"We'll send you the confirmation mail shortly"}
+        </div>
         <div className="font-medium">
           Your OrderID: <span className="font-semibold">{orderId}</span>
         </div>

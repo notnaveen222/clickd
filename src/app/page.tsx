@@ -1,5 +1,4 @@
 import Image from "next/image";
-import ProcessBox from "@/components/ProcessBox";
 import FaqBox from "@/components/FaqBox";
 import Footer from "@/components/Footer";
 import RouterButton from "@/components/router-button";
@@ -86,7 +85,7 @@ export default function Home() {
             process
           </div>
         </FadeInAnimation>
-        <ProcessContainer />
+        <ProcessContainer processDescription={processDescriptions} />
         <div className="text-center">
           <RouterButton
             styles="font-medium text-17 px-5 py-2 bg-[#D9D9D9]/70 hover:bg-[#D9D9D9] transition-all duration-150 my-8 rounded-full cursor-pointer"

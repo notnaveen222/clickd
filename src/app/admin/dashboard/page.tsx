@@ -1,5 +1,4 @@
 import DownloadImagesButton from "@/components/DownloadImagesButton";
-import DownloadImageButton from "@/components/DownloadImagesButton";
 import OrderShippedButton from "@/components/OrderShippedButton";
 import { getUnshippedOrders } from "@/lib/supabase-actions";
 import { Order } from "@/types/order";

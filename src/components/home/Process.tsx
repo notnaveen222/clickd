@@ -1,12 +1,16 @@
 "use client";
 import ProcessBox from "@/components/ProcessBox";
-import { delay, motion } from "framer-motion";
-const processDescriptions = [
-  "Take/Upload your favourite photos from your computer, phone.",
-  "Choose the strip layout you wish to order and get photo strips that suit your style.",
-  "Place your order and receive high-quality printed photo strips delivered to your door.",
-];
-export default function ProcessContainer() {
+import { motion } from "framer-motion";
+// const processDescriptions = [
+//   "Take/Upload your favourite photos from your computer, phone.",
+//   "Choose the strip layout you wish to order and get photo strips that suit your style.",
+//   "Place your order and receive high-quality printed photo strips delivered to your door.",
+// ];
+export default function ProcessContainer({
+  processDescription,
+}: {
+  processDescription: string[];
+}) {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -31,19 +35,19 @@ export default function ProcessContainer() {
       <ProcessBox
         imageURL="image"
         title="1. Choose your images"
-        description={processDescriptions[0]}
+        description={processDescription[0]}
         variants={item}
       />
       <ProcessBox
         imageURL="wand"
         title="2. Customize Design"
-        description={processDescriptions[1]}
+        description={processDescription[1]}
         variants={item}
       />
       <ProcessBox
         imageURL="truck"
         title="3. Order and Recieve"
-        description={processDescriptions[2]}
+        description={processDescription[2]}
         variants={item}
       />
     </motion.div>

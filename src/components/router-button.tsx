@@ -7,7 +7,7 @@ export default function RouterButton({
 }: {
   styles: string;
   title: string;
-  route: "order" | "pricing" | "contact" | "";
+  route: string;
 }) {
   const router = useRouter();
   return (

@@ -41,19 +41,29 @@ const Footer = () => {
           <div className="text-[25px] mb-2 font-medium">Quick Links</div>
           <div className="flex flex-row gap-x-5 sm:flex-col ">
             <RouterButton
-              styles="text-lg w-fit font-medium cursor-pointer"
-              route=""
-              title="Home"
+              styles="text-base w-fit font-medium cursor-pointer"
+              route="privacy"
+              title="Privacy"
             />
             <RouterButton
-              styles="text-lg w-fit font-medium cursor-pointer"
-              route="order"
-              title="Order"
+              styles="text-base w-fit font-medium cursor-pointer"
+              route="terms"
+              title="Terms & Conditions"
             />
             <RouterButton
-              styles="text-lg w-fit font-medium cursor-pointer"
-              route="contact"
-              title="Contact"
+              styles="text-base w-fit font-medium cursor-pointer"
+              route="shipping"
+              title="Shipping Details"
+            />
+            <RouterButton
+              styles="text-base w-fit font-medium cursor-pointer"
+              route="cancellation-refund"
+              title="Cancellation & Refund"
+            />
+            <RouterButton
+              styles="text-base w-fit font-medium cursor-pointer"
+              route="terms"
+              title="Terms & Conditions"
             />
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { generateClientOrderId } from "@/lib/supabase-actions";
+import { generateClientOrderId, getLayoutPrice } from "@/lib/supabase-actions";
 import { serverOrderSchema } from "@/lib/zod";
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
       );
     }
     const { layout, quantity } = body;
-    const total_inr_rs = Number(layout.price) * Number(quantity);
+    const dbInr = await getLayoutPrice(layout.id);
+    const total_inr_rs = Number(dbInr) * Number(quantity);
     const client_order_id = await generateClientOrderId();
     const orderPayload = {
       ...body,
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
     const sbOrderId = sbData ? sbData[0].id : null;
     const rpOrder = await razorpay.orders.create({
       amount: Math.round(total_inr_rs * 100),
+      //amount: Math.round(1 * 100),
       currency: "INR",
       //   receipt: String(sbData[0].id),
       //   notes: { layout: layout.name, qty: String(quantity) },

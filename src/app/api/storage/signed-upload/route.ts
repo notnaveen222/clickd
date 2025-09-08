@@ -16,15 +16,28 @@ function sanitize(name: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { filename } = (await request.json()) as { filename: string };
-    if (!filename)
-      return NextResponse.json({ error: "filename required" }, { status: 400 });
+    const { filename, index } = (await request.json()) as {
+      filename: string;
+      index: number;
+    };
+    if (
+      !filename ||
+      index === undefined ||
+      index === null ||
+      index < 0 ||
+      Number.isNaN(index)
+    )
+      return NextResponse.json(
+        { error: "Information {filename/index} required" },
+        { status: 400 }
+      );
 
     const sid = await readSessionId();
 
-    const path = `temp/${sid}/${randomUUID().slice(0, 8)}_${sanitize(
-      filename
-    )}`;
+    const path = `temp/${sid}/order-${index + 1}_${randomUUID().slice(
+      0,
+      8
+    )}_${sanitize(filename)}`;
     const { data, error } = await supabaseAdmin.storage
       .from(BUCKET)
       .createSignedUploadUrl(path);

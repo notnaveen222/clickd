@@ -111,3 +111,15 @@ export async function markOrderShipped(id: string) {
   }
   return { ok: true as const };
 }
+
+export async function getLayoutPrice(id: string): Promise<number> {
+  const { data, error } = await supabase
+    .from("prices")
+    .select("layoutPrice")
+    .eq("layoutId", id)
+    .single();
+  if (error) {
+    throw error;
+  }
+  return data.layoutPrice as number;
+}

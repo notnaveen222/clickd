@@ -253,13 +253,13 @@ export default function Order() {
   // };
   const uploadImagesToSupabase = async () => {
     return Promise.all(
-      photos.map(async (file) => {
+      photos.map(async (file, index) => {
         try {
           const res = await fetch("/api/storage/signed-upload", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ filename: file.name }),
+            body: JSON.stringify({ filename: file.name, index: index }),
           });
           if (!res.ok) {
             throw new Error("signed-upload failed");

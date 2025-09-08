@@ -68,7 +68,7 @@ export default function PreviewPane({
             </div>
             <div className="text-lg selection:text-black selection:bg-white hidden sm:inline">
               Note: Any Adjustments you can enter it in the Addition information
-              box in the next page, We'll try our best.
+              box in the next page, We&apos;ll try our best.
             </div>
           </div>
         ) : selectedLayout.photos === 3 ? (
@@ -124,7 +124,7 @@ export default function PreviewPane({
 
             <div className="text-lg  selection:text-black selection:bg-white hidden sm:inline">
               Note: Any Adjustments you can enter it in the Addition information
-              box in the next page, We'll try our best.
+              box in the next page, We&apos;ll try our best.
             </div>
           </div>
         ) : null)}

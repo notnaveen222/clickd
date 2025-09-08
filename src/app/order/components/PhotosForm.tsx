@@ -1,8 +1,9 @@
 "use client";
 import { layout } from "../page";
 import { Camera, Upload } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import TakePhotosPane from "./TakePhotosPane";
+import PreviewPane from "./PreviewPane";
 
 const IMAGE_FORMAT_ALLOWED = [
   "image/jpeg",
@@ -21,6 +22,8 @@ export default function PhotosPage({
   setPhotos,
   photoMethod,
   setPhotoMethod,
+  viewPreviewPane,
+  setViewPreviewPane,
 }: {
   selectedLayout: layout | null;
   currentStep: number;
@@ -30,6 +33,8 @@ export default function PhotosPage({
   photos: File[];
   setPhotoMethod: (method: "take" | "upload" | null) => void;
   setPhotos: React.Dispatch<React.SetStateAction<File[]>>;
+  viewPreviewPane: boolean;
+  setViewPreviewPane: (viewPreviewPane: boolean) => void;
 }) {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedLayout) return;
@@ -202,6 +207,12 @@ export default function PhotosPage({
               </div>
             </div>
           )}
+          <PreviewPane
+            selectedLayout={selectedLayout}
+            viewPreviewPane={viewPreviewPane}
+            setViewPreviewPane={setViewPreviewPane}
+            photos={photos}
+          />
         </div>
       )}
     </>

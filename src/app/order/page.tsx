@@ -3,7 +3,7 @@
 //handle currentStep in seperate function, detailed ifs
 //handle number of photos uploaded, if quantity multiple, then check if enough photos uploaded for one strip, or for full quantity
 //handle multiple of 4 photo upload even tho quantity set to 1
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Package } from "lucide-react";
 import Script from "next/script";
@@ -76,6 +76,8 @@ export default function Order() {
   );
   const [photos, setPhotos] = useState<File[]>([]);
   // const [uploadHint, setUploadHint] = useState<string | null>(null);
+
+  const [viewPreviewPane, setViewPreviewPane] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -101,6 +103,7 @@ export default function Order() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imagesUploaded, setImagesUploaded] = useState<boolean>(false);
   const [imageUploadError, setImageUploadError] = useState<boolean>(false);
+
   const onSubmit = async (values: FormFields) => {
     if (currentStep !== 4 || paymentStage !== "idle") {
       console.log("Form submission blocked:", { currentStep, paymentStage });
@@ -251,6 +254,14 @@ export default function Order() {
   //   // Clear the file input so selecting the same files again still triggers onChange
   //   event.target.value = "";
   // };
+  const maxPhotos = selectedLayout?.photos ?? 0;
+
+  useEffect(() => {
+    if (!selectedLayout) return;
+    setPhotos((prev) =>
+      prev.length > maxPhotos ? prev.slice(0, maxPhotos) : prev
+    );
+  }, [selectedLayout?.photos]);
   const uploadImagesToSupabase = async () => {
     return Promise.all(
       photos.map(async (file, index) => {
@@ -283,6 +294,11 @@ export default function Order() {
     if (!res.ok) throw new Error("Failed to rotate session id");
   }
 
+  const remainingPhotos = Math.max(
+    0,
+    (selectedLayout?.photos ?? 0) - photos.length
+  );
+
   return (
     <div className="mb-10 mt-4 ">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -292,7 +308,7 @@ export default function Order() {
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 step <= currentStep
-                  ? "bg-[#1980E5] text-white"
+                  ? "bg-[#1980E5] tex t-white"
                   : "bg-gray-200 text-gray-500"
               }`}
             >
@@ -332,6 +348,8 @@ export default function Order() {
               photos={photos}
               setPhotoMethod={setPhotoMethod}
               setPhotos={setPhotos}
+              viewPreviewPane={viewPreviewPane}
+              setViewPreviewPane={setViewPreviewPane}
             />
           )}
 
@@ -365,7 +383,13 @@ export default function Order() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between font-semibold text-gray-700 ">
-                    <div>Quantity</div>
+                    <div>
+                      Quantity{" "}
+                      <span className="font-medium text-sm">
+                        {" "}
+                        ( 1 Qty = 2 Strips )
+                      </span>
+                    </div>
                     <div className="">
                       <select
                         onChange={handleQuantityChange}
@@ -503,6 +527,22 @@ export default function Order() {
                     : paymentStage === "processing"
                     ? "Processing Payment..."
                     : "Pay & Place Order"}
+                </button>
+              )}
+              {currentStep == 3 && (
+                <button
+                  disabled={photos.length != selectedLayout?.photos}
+                  onClick={() => setViewPreviewPane(true)}
+                  className={`transition-all duration-200 rounded-lg text-black border border-gray-300 shadow-xs font-semibold cursor-pointer py-2 disabled:cursor-default disabled:text-black/60`}
+                >
+                  Preview Your Strip
+                  {remainingPhotos > 0 && (
+                    <>
+                      {" "}
+                      ({remainingPhotos} Image{remainingPhotos === 1 ? "" : "s"}{" "}
+                      left)
+                    </>
+                  )}
                 </button>
               )}
               {currentStep > 1 && (

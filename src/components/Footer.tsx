@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
         <div className="">
           <div className="text-[25px] mb-2 font-medium">Quick Links</div>
-          <div className="flex flex-row gap-x-5 sm:flex-col ">
+          <div className="flex flex-row flex-wrap justify-center gap-x-5 sm:flex-col ">
             <RouterButton
               styles="text-lg w-fit font-medium cursor-pointer"
               route="privacy"

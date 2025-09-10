@@ -37,6 +37,9 @@ export default function Home() {
   ];
   return (
     <>
+      <Head>
+        <meta name="google-site-verification" content="8f7JaWmL6bFt5241wpvcfal1bryjaY368jkG0E8Vz88" />
+      </Head>
       <div className="flex flex-col-reverse md:flex mb-12 lg:mb-28  md:flex-row px-5 lg:px-[10vw] w-full mt-5">
         <div className=" md:w-1/2 border opacity-0 fadeInAnimationCSSClass overflow-hidden mb-9 sm:mb-0 flex justify-center border-black/15  rounded-2xl">
           <div className="flex relative ">

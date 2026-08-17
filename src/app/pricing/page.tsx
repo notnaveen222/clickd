@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getLayouts } from "@/lib/layouts";
 
+export const revalidate = 0;
+
 export default async function PricingPage() {
   const layouts = await getLayouts();
 

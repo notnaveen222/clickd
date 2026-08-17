@@ -1,4 +1,3 @@
-import { supabase } from "./supabase";
 import { BUCKET, supabaseAdmin } from "./supabaseAdmin";
 
 export async function generateClientOrderId() {
@@ -6,7 +5,7 @@ export async function generateClientOrderId() {
   let id = "";
   while (!unique) {
     id = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from("orders")
       .select("id")
       .eq("client_order_id", id)
@@ -65,12 +64,14 @@ export async function confirmUploadedPhotos({
       }
     }
 
-    // // 4. Clean up empty temp folder
-    // try {
-    //   await supabaseAdmin.storage.from(BUCKET).remove([`temp/${sessionId}`]);
-    // } catch (cleanupError) {
-    //   console.error("Error cleaning up temp folder:", cleanupError);
-    // }
+    // 3. Clean up the now-empty temp folder (best-effort, don't fail the order over it)
+    try {
+      await supabaseAdmin.storage
+        .from(BUCKET)
+        .remove(tempFiles.map((f) => `temp/${sessionId}/${f.name}`));
+    } catch (cleanupError) {
+      console.error("Error cleaning up temp folder:", cleanupError);
+    }
 
     return {
       success: true,
@@ -112,8 +113,19 @@ export async function markOrderShipped(id: string) {
   return { ok: true as const };
 }
 
+export type PriceRow = {
+  id: string;
+  layoutId: string;
+  layoutPrice: number;
+  name: string | null;
+  description: string | null;
+  photos: number | null;
+};
+
+const PRICE_COLUMNS = "id, layoutId, layoutPrice, name, description, photos";
+
 export async function getLayoutPrice(id: string): Promise<number> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("prices")
     .select("layoutPrice")
     .eq("layoutId", id)
@@ -121,5 +133,28 @@ export async function getLayoutPrice(id: string): Promise<number> {
   if (error) {
     throw error;
   }
-  return data.layoutPrice as number;
+  return Number(data.layoutPrice);
+}
+
+export async function listPrices(): Promise<PriceRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from("prices")
+    .select(PRICE_COLUMNS)
+    .order("layoutId", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as PriceRow[];
+}
+
+export async function updatePrice(
+  layoutId: string,
+  fields: { layoutPrice?: number; name?: string; description?: string }
+): Promise<PriceRow> {
+  const { data, error } = await supabaseAdmin
+    .from("prices")
+    .update(fields)
+    .eq("layoutId", layoutId)
+    .select(PRICE_COLUMNS)
+    .single();
+  if (error) throw error;
+  return data as PriceRow;
 }

@@ -1,6 +1,8 @@
 "use client";
 import { Image as ImageIcon, Truck, WandSparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+
 interface BoxProp {
   imageURL: "image" | "truck" | "wand";
   title: string;
@@ -12,24 +14,25 @@ interface BoxProp {
 }
 
 const icons = {
-  image: <ImageIcon className="w-8 h-8 text-blue-600" />,
-  truck: <Truck className="w-8 h-8 text-blue-600" />,
-  wand: <WandSparkles className="w-8 h-8 text-blue-600" />,
+  image: <ImageIcon className="size-8 text-brand-blue" />,
+  truck: <Truck className="size-8 text-brand-blue" />,
+  wand: <WandSparkles className="size-8 text-brand-blue" />,
 };
 
 const ProcessBox = ({ imageURL, title, description, variants }: BoxProp) => {
   return (
-    <motion.div
-      variants={variants}
-      className="w-[340px] md:w-[280px] lg:w-[350px] mt-10 rounded-3xl bg-surface-gray/50 px-3 h-[210px] md:h-[260px] py-8 gap-3 flex flex-col justify-center items-center"
-    >
-      <div className="bg-brand-blue/30 p-2.5 rounded-full flex items-center justify-center">
-        {icons[imageURL]}
-      </div>
-      <div className="text-[22px] font-semibold">{title}</div>
-      <div className="text-sub-text font-medium text-center text-[17px]">
-        {description}
-      </div>
+    <motion.div variants={variants} className="mt-10">
+      <Card className="flex h-[210px] w-[340px] flex-col items-center justify-center gap-3 rounded-3xl border-gray-200 bg-surface-gray/40 px-3 py-8 shadow-sm transition-shadow hover:shadow-md md:h-[260px] md:w-[280px] lg:w-[350px]">
+        <CardContent className="flex flex-col items-center gap-3 p-0 text-center">
+          <div className="flex items-center justify-center rounded-full bg-brand-blue/15 p-2.5">
+            {icons[imageURL]}
+          </div>
+          <div className="text-[22px] font-semibold">{title}</div>
+          <div className="text-center text-[17px] font-medium text-sub-text">
+            {description}
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

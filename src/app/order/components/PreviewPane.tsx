@@ -60,12 +60,13 @@ export default function PreviewPane({
               />
             </div>
 
-            <div
-              className="bg-white/40 rounded-full py-1 px-1 absolute top-5 right-2 sm:right-5 cursor-pointer"
+            <button
+              type="button"
+              className="bg-white/40 hover:bg-white/60 transition-colors rounded-full py-1 px-1 absolute top-5 right-2 sm:right-5 cursor-pointer"
               onClick={() => setViewPreviewPane(false)}
             >
               <X />
-            </div>
+            </button>
             <div className="text-lg selection:text-black selection:bg-white hidden sm:inline">
               Note: Any Adjustments you can enter it in the Addition information
               box in the next page, We&apos;ll try our best.
@@ -115,12 +116,13 @@ export default function PreviewPane({
               />
             </div>
 
-            <div
-              className="bg-white/40 rounded-full py-1 px-1 absolute top-5 right-2 sm:right-5 cursor-pointer"
+            <button
+              type="button"
+              className="bg-white/40 hover:bg-white/60 transition-colors rounded-full py-1 px-1 absolute top-5 right-2 sm:right-5 cursor-pointer"
               onClick={() => setViewPreviewPane(false)}
             >
               <X />
-            </div>
+            </button>
 
             <div className="text-lg  selection:text-black selection:bg-white hidden sm:inline">
               Note: Any Adjustments you can enter it in the Addition information

@@ -1,49 +1,62 @@
 import Image from "next/image";
-import { stripLayouts } from "../order/components/LayoutForm";
-export default function PricingPage() {
+import Link from "next/link";
+import { Camera } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { getLayouts } from "@/lib/layouts";
+
+export default async function PricingPage() {
+  const layouts = await getLayouts();
+
   return (
-    <>
-      <div className="flex grow justify-center items-center">
-        <div className="border border-gray-200 mt-5 sm:mt-0 p-8 sm:px-28 mx-5 flex flex-col items-center rounded-xl shadow-md">
-          <div className="font-semibold text-4xl text-center mb-2">Pricing</div>
-          <div className=" text-sub-text font-medium text-center">
-            These are our current available strip layouts and their respective
-            pricing
+    <div className="flex grow items-center justify-center px-3 py-8 sm:py-0">
+      <Card className="mx-2 w-full max-w-3xl border-gray-200 p-6 shadow-md sm:p-10">
+        <CardContent className="flex flex-col items-center gap-6 p-0">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <div className="mb-1 flex size-10 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+              <Camera className="size-5" />
+            </div>
+            <div className="text-4xl font-semibold">Pricing</div>
+            <div className="text-sub-text font-medium">
+              These are our current available strip layouts and their respective
+              pricing
+            </div>
+            <div className="text-sub-text font-medium">
+              A lot more coming soon !!!
+            </div>
           </div>
-          <div className="text-sub-text font-medium mb-5">
-            A lot more coming soon !!!
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  w-fit">
-            {stripLayouts.map((layout) => (
+
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+            {layouts.map((layout) => (
               <div
                 key={layout.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md 
-                    border-gray-200
-                }`}
+                className="flex flex-col items-center rounded-lg border border-gray-200 p-4 text-center transition-all hover:shadow-md"
               >
-                <div className="aspect-[2/3] bg-gray-100 rounded mb-3 flex items-center justify-center">
+                <div className="flex aspect-[2/3] w-full items-center justify-center rounded bg-gray-100">
                   <Image
                     src={layout.image_url}
-                    alt="Layout Image"
+                    alt={layout.name}
                     width={150}
                     height={250}
-                    className="my-5 mx-10"
+                    className="my-5"
                   />
                 </div>
                 <h3 className="font-semibold text-gray-900">{layout.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="mb-2 text-sm text-gray-600">
                   {layout.description}
                 </p>
-                <div className="flex items-center justify-between">
-                  <div className="bg-brand-blue text-white font-semibold px-2 rounded-lg">
-                    ₹{layout.price}
-                  </div>
+                <div className="rounded-lg bg-brand-blue px-2 font-semibold text-white">
+                  ₹{layout.price}
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-    </>
+
+          <Button asChild size="lg" className="rounded-full px-6">
+            <Link href="/order">Order Now</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

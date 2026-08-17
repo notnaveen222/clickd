@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import crypto from "crypto";
 import { confirmUploadedPhotos } from "@/lib/supabase-actions";
 import { readSessionId } from "@/lib/session";
 import { sendConfirmationMail } from "@/lib/nodemailer-actions";
 
 export const runtime = "nodejs";
+
+function verifySignature(orderId: string, paymentId: string, signature: string) {
+  const expected = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET as string)
+    .update(`${orderId}|${paymentId}`)
+    .digest("hex");
+
+  const expectedBuf = Buffer.from(expected, "hex");
+  const signatureBuf = Buffer.from(signature, "hex");
+  if (expectedBuf.length !== signatureBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,20 +33,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // 1) compute HMAC(order_id|payment_id)
-    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET as string)
-      .update(body)
-      .digest("hex");
-
-    const verified = crypto.timingSafeEqual(
-      Buffer.from(expected, "hex"),
-      Buffer.from(razorpay_signature, "hex")
+    const verified = verifySignature(
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
     );
 
-    // 2) update order row
-    const sid = await readSessionId();
     const update = verified
       ? {
           razorpay_payment_id,
@@ -49,27 +53,10 @@ export async function POST(req: NextRequest) {
           signature_verified: false,
           status: "FAILED",
         };
-    if (verified && sid) {
-      const res = await confirmUploadedPhotos({
-        sessionId: sid,
-        clientOrderId: client_order_id,
-      });
-      if (res.success) {
-        try {
-          await sendConfirmationMail(email, client_order_id);
-        } catch (error) {
-          return NextResponse.json(
-            {
-              ok: false,
-              message: "Order Confirmed, but confirmation email failed to send",
-              error,
-            },
-            { status: 502 }
-          );
-        }
-      }
-    }
-    const { error } = await supabase
+
+    // Update the order's payment status first — this must succeed regardless
+    // of whether the confirmation email goes out afterwards.
+    const { error } = await supabaseAdmin
       .from("orders")
       .update(update)
       .eq("razorpay_order_id", razorpay_order_id);
@@ -78,7 +65,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "DB update failed" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: verified });
+    let emailError: string | null = null;
+    if (verified) {
+      const sid = await readSessionId();
+      if (sid) {
+        const res = await confirmUploadedPhotos({
+          sessionId: sid,
+          clientOrderId: client_order_id,
+        });
+        if (res.success && email) {
+          try {
+            await sendConfirmationMail(email, client_order_id);
+          } catch (err) {
+            console.error("Failed to send confirmation mail:", err);
+            emailError = "Order confirmed, but the confirmation email failed to send";
+          }
+        }
+      }
+    }
+
+    return NextResponse.json({ ok: verified, emailError });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

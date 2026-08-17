@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from "@/lib/admin-auth";
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/api/admin/:path*"],
 };
 
-export function middleware(req: NextRequest) {
-  const auth = req.headers.get("authorization") ?? "";
-  const expected =
-    "Basic " + btoa(`${process.env.ADMIN_USER}:${process.env.ADMIN_PASS}`);
+const PUBLIC_PATHS = new Set(["/admin/login", "/api/admin/login"]);
 
-  if (auth !== expected) {
-    return new NextResponse("Auth required", {
-      status: 401,
-      headers: { "WWW-Authenticate": 'Basic realm="Admin"' },
-    });
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  if (PUBLIC_PATHS.has(pathname)) {
+    return NextResponse.next();
   }
+
+  const token = req.cookies.get(ADMIN_SESSION_COOKIE)?.value;
+  const authed = await verifyAdminSessionToken(token);
+
+  if (!authed) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const url = req.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }

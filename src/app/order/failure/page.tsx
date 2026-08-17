@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default async function FailurePage({
   searchParams,
@@ -10,8 +12,8 @@ export default async function FailurePage({
   const orderId = params.orderId ?? "";
 
   return (
-    <div className="flex flex-col items-center justify-center grow px-2">
-      <div className="bg-red-600 flex flex-col items-center rounded-xl py-10 px-8 sm:px-10 text-white">
+    <div className="flex grow flex-col items-center justify-center px-2">
+      <Card className="flex flex-col items-center rounded-xl bg-red-600 px-8 py-10 text-white sm:px-10">
         <Image
           src="/cross.png"
           alt="payment failed icon"
@@ -19,8 +21,8 @@ export default async function FailurePage({
           height={80}
           className="mb-2"
         />
-        <div className="text-3xl font-semibold mb-2">Order Failed</div>
-        <div className="font-semibold w-10/12 text-center mb-1">
+        <div className="mb-2 text-3xl font-semibold">Order Failed</div>
+        <div className="mb-1 w-10/12 text-center font-semibold">
           {
             "If an amount was debited, don't worry—please contact us and we'll help."
           }
@@ -31,21 +33,23 @@ export default async function FailurePage({
           <span className="font-semibold">{orderId || "N/A"}</span>
         </div>
 
-        <div className="flex gap-x-2 mt-4">
-          <Link
-            href="/contact"
-            className="border-2 border-white rounded-lg bg-transparent px-3 py-1.5 font-semibold hover:bg-white hover:text-red-600 transition"
+        <div className="mt-4 flex gap-x-2">
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto rounded-lg border-2 border-white bg-transparent px-3 py-1.5 font-semibold text-white hover:bg-white hover:text-red-600"
           >
-            Contact
-          </Link>
-          <Link
-            href="/"
-            className="border-2 border-white rounded-lg bg-transparent px-3 py-1.5 font-semibold hover:bg-white hover:text-red-600 transition"
+            <Link href="/contact">Contact</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto rounded-lg border-2 border-white bg-transparent px-3 py-1.5 font-semibold text-white hover:bg-white hover:text-red-600"
           >
-            Back to home
-          </Link>
+            <Link href="/">Back to home</Link>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

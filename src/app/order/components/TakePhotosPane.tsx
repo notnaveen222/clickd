@@ -9,6 +9,8 @@ import React, {
 import { Camera } from "lucide-react";
 // adjust this path based on where this file lives relative to your page
 import { layout } from "../page";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 // ---------- utils ----------
 function sleep(ms: number) {
@@ -291,7 +293,7 @@ export default function TakePhotosPane({
   }, []);
 
   return (
-    <div className="border border-gray-200 p-5 transition-all duration-200 rounded-xl shadow-md">
+    <Card className="rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-200">
       <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
         <Camera className="text-brand-blue size-6" />
         <div>Take Photos</div>
@@ -350,40 +352,38 @@ export default function TakePhotosPane({
 
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 mt-4">
-        <button
+        <Button
           type="button"
-          className={`px-3 py-2 cursor-pointer rounded-lg font-semibold text-white ${
-            isCapturing
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-brand-blue hover:brightness-110"
-          }`}
+          className="h-auto rounded-lg bg-brand-blue px-3 py-2 font-semibold text-white hover:bg-brand-blue/90 disabled:bg-gray-400"
           disabled={!ready || isCapturing || targetTotal - photos.length <= 0}
           onClick={startAutoCapture}
         >
           {targetTotal - photos.length > 0
             ? `Start ( ${targetTotal - photos.length} to go )`
             : "All set"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="px-3 cursor-pointer py-2 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50"
+          variant="outline"
+          className="h-auto rounded-lg border-gray-300 px-3 py-2 font-semibold"
           onClick={stopAutoCapture}
           disabled={!isCapturing}
         >
           Stop
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="px-3 py-2 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50"
+          variant="outline"
+          className="h-auto rounded-lg border-gray-300 px-3 py-2 font-semibold"
           onClick={switchFacing}
           disabled={!ready}
         >
           Switch Camera ({facing === "environment" ? "Rear" : "Front"})
-        </button>
+        </Button>
         <div className="text-sm text-gray-600 ml-auto">
           Captured {photos.length}/{targetTotal}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

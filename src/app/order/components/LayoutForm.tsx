@@ -1,89 +1,86 @@
+"use client";
+
 import { Image as ImageIcon } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
-
-import strip1x3 from "../../../../public/layouts/3photostrip.png";
-import strip1x4 from "../../../../public/layouts/4photostrip.png";
-
-interface layout {
-  id: string;
-  name: string;
-  photos: number;
-  description: string;
-  price: number;
-  image_url: StaticImageData;
-}
-
-export const stripLayouts = [
-  {
-    id: "1x3",
-    name: "Photostrip (3 Photos)",
-    photos: 3,
-    description: "3 Photos in a classic strip format ",
-    price: 179,
-    image_url: strip1x3,
-  },
-  {
-    id: "1x4",
-    name: "Photostrip (4 Photos)",
-    photos: 4,
-    description: "4 Photos in a classic strip format ",
-    price: 199,
-    image_url: strip1x4,
-  },
-];
+import Image from "next/image";
+import { useLayouts, LiveLayout } from "@/lib/use-layouts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 export default function LayoutPage({
   selectedLayout,
   setSelectedLayout,
 }: {
-  selectedLayout: layout | null;
-  setSelectedLayout(layout: layout): void;
+  selectedLayout: LiveLayout | null;
+  setSelectedLayout(layout: LiveLayout): void;
 }) {
+  const { layouts, loading, error } = useLayouts();
+
   return (
-    <div className="border border-gray-200 p-5 mx-2 rounded-xl shadow-md">
-      <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
-        <ImageIcon className="text-brand-blue size-6" />
+    <div className="rounded-xl border border-gray-200 p-5 shadow-sm">
+      <div className="mb-1 flex items-center gap-x-2 text-xl font-semibold">
+        <ImageIcon className="size-6 text-brand-blue" />
         Choose Your Strip Layout
       </div>
-      <div className="text-gray-600 font-medium mb-4">
+      <div className="mb-4 font-medium text-gray-600">
         Select the perfect layout for your photo strip
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        {stripLayouts.map((layout) => (
-          <div
-            key={layout.id}
-            className={`border rounded-lg p-2 md:p-4 cursor-pointer transition-all hover:shadow-md ${
-              selectedLayout?.id === layout.id
-                ? "border-[#1980E5] bg-blue-50"
-                : "border-gray-200"
-            }`}
-            onClick={() => setSelectedLayout(layout)}
-          >
-            <div className="aspect-[2/3] bg-gray-100 rounded mb-3 flex items-center justify-center">
-              <Image
-                src={layout.image_url}
-                alt="Layout Image"
-                width={150}
-                height={250}
-                priority
-                placeholder="blur"
-              />
+
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-600">
+          Couldn&apos;t load layouts, please refresh.
+        </div>
+      )}
+
+      {loading && !error && (
+        <div className="grid grid-cols-2 gap-4">
+          {[0, 1].map((i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-2 md:p-4">
+              <Skeleton className="aspect-[2/3] w-full rounded-md" />
+              <Skeleton className="mt-3 h-4 w-3/4" />
+              <Skeleton className="mt-2 h-3 w-full" />
+              <Skeleton className="mt-2 h-5 w-16" />
             </div>
-            <h3 className="font-semibold text-gray-900">{layout.name}</h3>
-            <p className="text-sm text-gray-600 mb-2">{layout.description}</p>
-            <div className="flex items-center justify-between">
-              <div className="bg-gray-100 text-gray-700 px-2 rounded-lg">
-                ₹{layout.price}
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="grid grid-cols-2 gap-4">
+          {layouts.map((layout) => (
+            <button
+              type="button"
+              key={layout.id}
+              className={`rounded-lg border p-2 text-left transition-all hover:shadow-md md:p-4 ${
+                selectedLayout?.id === layout.id
+                  ? "border-brand-blue bg-blue-50"
+                  : "border-gray-200"
+              }`}
+              onClick={() => setSelectedLayout(layout)}
+            >
+              <div className="mb-3 flex aspect-[2/3] items-center justify-center rounded bg-gray-100">
+                <Image
+                  src={layout.image_url}
+                  alt={layout.name}
+                  width={150}
+                  height={250}
+                  priority
+                  placeholder="blur"
+                />
               </div>
-              {selectedLayout?.id === layout.id && (
-                <div className="bg-[#1980E5] font-semibold px-2 text-sm rounded-md text-white">
-                  Selected
+              <h3 className="font-semibold text-gray-900">{layout.name}</h3>
+              <p className="mb-2 text-sm text-gray-600">{layout.description}</p>
+              <div className="flex items-center justify-between">
+                <div className="rounded-lg bg-gray-100 px-2 text-gray-700">
+                  ₹{layout.price}
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+                {selectedLayout?.id === layout.id && (
+                  <Badge className="bg-brand-blue text-white">Selected</Badge>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -7,22 +7,20 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Package } from "lucide-react";
 import Script from "next/script";
+import { AnimatePresence, motion } from "framer-motion";
 import LayoutPage from "./components/LayoutForm";
 import PhotosPage from "./components/PhotosForm";
 import ShippingDetailsPage from "./components/ShippingDetails";
 import { supabase } from "@/lib/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderSchema } from "@/lib/zod";
-import { StaticImageData } from "next/image";
+import { LiveLayout } from "@/lib/use-layouts";
+import { Stepper } from "@/components/ui/stepper";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export interface layout {
-  id: string;
-  name: string;
-  photos: number;
-  description: string;
-  price: number;
-  image_url: StaticImageData;
-}
+export type layout = LiveLayout;
 interface RazorpayPrefill {
   name?: string;
   email?: string;
@@ -66,6 +64,14 @@ declare global {
     };
   }
 }
+
+const STEP_LABELS = ["Layout", "Method", "Photos", "Shipping"];
+const STEP_TITLES: Record<number, string> = {
+  1: "Choose Layout",
+  2: "Photo Method",
+  3: "Add Photos",
+  4: "Shipping & Payment",
+};
 
 export default function Order() {
   const [selectedLayout, setSelectedLayout] = useState<layout | null>(null);
@@ -201,59 +207,9 @@ export default function Order() {
     }
   };
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setQuantity(Number.parseInt(e.target.value));
+  const handleQuantityChange = (value: string) => {
+    setQuantity(Number.parseInt(value));
   };
-  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (!selectedLayout) return;
-
-  //   const perStrip = selectedLayout.photos; // e.g., 4
-  //   const incoming = Array.from(event.target.files || []);
-  //   if (incoming.length === 0) return;
-
-  //   setUploadedPhotos((prev) => {
-  //     // How many we can add to keep total a multiple of perStrip?
-  //     const current = prev.length;
-  //     const targetTotal = current + incoming.length;
-
-  //     // Max total we allow right now = greatest multiple of perStrip not exceeding targetTotal
-  //     const allowedTotal =
-  //       perStrip > 0
-  //         ? Math.floor(targetTotal / perStrip) * perStrip
-  //         : targetTotal;
-
-  //     const canAdd = Math.max(0, allowedTotal - current);
-  //     const toAdd = incoming.slice(0, canAdd);
-
-  //     // Hint messaging
-  //     if (toAdd.length === 0) {
-  //       // Already at a clean multiple — tell user how many are needed to start the next set
-  //       const neededForNextSet =
-  //         perStrip > 0 ? perStrip - (current % perStrip || 0) : 0;
-  //       setUploadHint(
-  //         neededForNextSet > 0
-  //           ? `Add ${neededForNextSet} more to complete the next set of ${perStrip}.`
-  //           : `You can add ${perStrip} photos to start a new set.`
-  //       );
-  //       return prev;
-  //     }
-
-  //     const ignored = incoming.length - toAdd.length;
-  //     if (ignored > 0) {
-  //       setUploadHint(
-  //         `Added ${toAdd.length} photo${toAdd.length > 1 ? "s" : ""}. ` +
-  //           `${ignored} ignored to keep a multiple of ${perStrip}.`
-  //       );
-  //     } else {
-  //       setUploadHint(null);
-  //     }
-
-  //     return [...prev, ...toAdd];
-  //   });
-
-  //   // Clear the file input so selecting the same files again still triggers onChange
-  //   event.target.value = "";
-  // };
   const maxPhotos = selectedLayout?.photos ?? 0;
 
   useEffect(() => {
@@ -261,6 +217,7 @@ export default function Order() {
     setPhotos((prev) =>
       prev.length > maxPhotos ? prev.slice(0, maxPhotos) : prev
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLayout?.photos]);
   const uploadImagesToSupabase = async () => {
     return Promise.all(
@@ -302,68 +259,56 @@ export default function Order() {
   return (
     <div className="mb-10 mt-4 ">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      <div className="flex items-center justify-center space-x-0 mb-2">
-        {[1, 2, 3, 4].map((step) => (
-          <div key={step} className="flex items-center">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step <= currentStep
-                  ? "bg-[#1980E5] tex t-white"
-                  : "bg-gray-200 text-gray-500"
-              }`}
-            >
-              {step}
-            </div>
-            {step < 4 && (
-              <div
-                className={`w-12 h-0.5 ${
-                  step < currentStep ? "bg-[#1980E5]" : "bg-gray-200"
-                }`}
-              />
-            )}
-          </div>
-        ))}
+      <div className="mb-2 px-4">
+        <Stepper steps={STEP_LABELS.map((label) => ({ label }))} currentStep={currentStep} />
       </div>
       <div className="text-center text-base mb-4 font-medium text-black/60">
-        {currentStep === 1 && "Choose Layout"}
-        {currentStep === 2 && "Photo Method"}
-        {currentStep === 3 && "Add Photos"}
-        {currentStep === 4 && "Shipping & Payment"}
+        {STEP_TITLES[currentStep]}
       </div>
       <div className="grid grid-cols-1  md:grid-cols-3 gap-y-3 sm:gap-y-0 sm:gap-x-2 lg:gap-x-8 sm:max-w-7xl px-2 sm:mx-auto ">
         <div className=" col-span-2">
-          {currentStep == 1 && (
-            <LayoutPage
-              selectedLayout={selectedLayout}
-              setSelectedLayout={setSelectedLayout}
-            />
-          )}
-          {(currentStep == 2 || currentStep == 3) && (
-            <PhotosPage
-              selectedLayout={selectedLayout}
-              setCurrentStep={setCurrentStep}
-              currentStep={currentStep}
-              quantity={quantity}
-              photoMethod={photoMethod}
-              photos={photos}
-              setPhotoMethod={setPhotoMethod}
-              setPhotos={setPhotos}
-              viewPreviewPane={viewPreviewPane}
-              setViewPreviewPane={setViewPreviewPane}
-            />
-          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              {currentStep == 1 && (
+                <LayoutPage
+                  selectedLayout={selectedLayout}
+                  setSelectedLayout={setSelectedLayout}
+                />
+              )}
+              {(currentStep == 2 || currentStep == 3) && (
+                <PhotosPage
+                  selectedLayout={selectedLayout}
+                  setCurrentStep={setCurrentStep}
+                  currentStep={currentStep}
+                  quantity={quantity}
+                  photoMethod={photoMethod}
+                  photos={photos}
+                  setPhotoMethod={setPhotoMethod}
+                  setPhotos={setPhotos}
+                  viewPreviewPane={viewPreviewPane}
+                  setViewPreviewPane={setViewPreviewPane}
+                />
+              )}
 
-          {currentStep == 4 && (
-            <ShippingDetailsPage
-              register={register}
-              handleSubmit={handleSubmit}
-              onSubmit={onSubmit}
-              errors={errors}
-            />
-          )}
+              {currentStep == 4 && (
+                <ShippingDetailsPage
+                  register={register}
+                  handleSubmit={handleSubmit}
+                  onSubmit={onSubmit}
+                  errors={errors}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
         <div className="col-span-1 ">
-          <div className="sm:sticky sm:top-6 flex flex-col border gap-y-5 transition-all duration-200 ease-in-out border-gray-200 p-5 rounded-xl shadow-md">
+          <Card className="sm:sticky sm:top-6 flex flex-col gap-y-5 rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-200 ease-in-out">
             <div className="flex items-center gap-x-4 ">
               <Package className="text-brand-blue" />
               <div className="font-semibold text-xl">Order Summary</div>
@@ -391,16 +336,21 @@ export default function Order() {
                       </span>
                     </div>
                     <div className="">
-                      <select
-                        onChange={handleQuantityChange}
-                        className="w-16 border transition-all  duration-200 ease-in-out  border-gray-300 rounded-lg shadow-sm px-2 py-1"
+                      <Select
+                        defaultValue="1"
+                        onValueChange={handleQuantityChange}
                       >
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                      </select>
+                        <SelectTrigger className="w-16" size="sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   {currentStep == 4 && (
@@ -430,39 +380,28 @@ export default function Order() {
             </div>
             <div className="flex flex-col gap-y-2 mb-3">
               {currentStep == 1 && (
-                <button
+                <Button
                   onClick={() => {
                     if (selectedLayout != null) {
                       setCurrentStep(currentStep + 1);
                     }
                   }}
-                  className={`${
-                    selectedLayout
-                      ? "bg-brand-blue/100 cursor-pointer"
-                      : "bg-brand-blue/75 cursor-default"
-                  }  transition-all duration-200 rounded-lg text-white font-semibold py-2`}
+                  disabled={!selectedLayout}
+                  className="h-auto rounded-lg bg-brand-blue py-2 text-base font-semibold text-white hover:bg-brand-blue/90"
                 >
                   Continue
-                </button>
+                </Button>
               )}
               {currentStep == 2 && (
-                <button
-                  // onClick={() => {
-                  //   if (photoMethod != null) {
-                  //     setCurrentStep(currentStep + 1);
-                  //   }
-                  // }}
-                  className={`${
-                    photoMethod
-                      ? "bg-brand-blue/100 "
-                      : "bg-brand-blue/75 cursor-default"
-                  }  transition-all duration-200 rounded-lg text-white font-semibold py-2`}
+                <Button
+                  disabled
+                  className="h-auto rounded-lg bg-brand-blue/75 py-2 text-base font-semibold text-white"
                 >
                   Choose an option
-                </button>
+                </Button>
               )}
               {currentStep == 3 && (
-                <button
+                <Button
                   disabled={
                     isUploading ||
                     photos.length !== (selectedLayout?.photos ?? 0) * quantity
@@ -491,17 +430,13 @@ export default function Order() {
                       setPaymentStage("idle"); // Ensure payment stage is reset
                     }
                   }}
-                  className={`${
-                    photos.length === (selectedLayout?.photos ?? 0) * quantity
-                      ? "bg-brand-blue/100 cursor-pointer"
-                      : "bg-brand-blue/75 cursor-default"
-                  } transition-all duration-200 rounded-lg text-white font-semibold py-2 mt-4`}
+                  className="h-auto rounded-lg bg-brand-blue py-2 mt-4 text-base font-semibold text-white hover:bg-brand-blue/90"
                 >
                   {isUploading ? "Uploading..." : "Proceed to Checkout"}
-                </button>
+                </Button>
               )}
               {currentStep == 4 && (
-                <button
+                <Button
                   type="submit"
                   form="order-form"
                   disabled={
@@ -510,13 +445,7 @@ export default function Order() {
                     paymentStage !== "idle" ||
                     imageUploadError
                   }
-                  className={`transition-all duration-200 rounded-lg text-white font-semibold py-2 ${
-                    !imagesUploaded ||
-                    Object.keys(errors).length > 0 ||
-                    paymentStage !== "idle"
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-brand-blue hover:bg-brand-blue cursor-pointer"
-                  }`}
+                  className="h-auto rounded-lg bg-brand-blue py-2 text-base font-semibold text-white hover:bg-brand-blue/90 disabled:bg-gray-400"
                 >
                   {!imagesUploaded
                     ? "Uploading Images..."
@@ -527,13 +456,14 @@ export default function Order() {
                     : paymentStage === "processing"
                     ? "Processing Payment..."
                     : "Pay & Place Order"}
-                </button>
+                </Button>
               )}
               {currentStep == 3 && (
-                <button
+                <Button
+                  variant="outline"
                   disabled={photos.length != selectedLayout?.photos}
                   onClick={() => setViewPreviewPane(true)}
-                  className={`transition-all duration-200 rounded-lg text-black border border-gray-300 shadow-xs font-semibold cursor-pointer py-2 disabled:cursor-default disabled:text-black/60`}
+                  className="h-auto rounded-lg border-gray-300 py-2 text-base font-semibold text-black shadow-xs"
                 >
                   Preview Your Strip
                   {remainingPhotos > 0 && (
@@ -543,20 +473,21 @@ export default function Order() {
                       left)
                     </>
                   )}
-                </button>
+                </Button>
               )}
               {currentStep > 1 && (
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setCurrentStep(currentStep - 1);
                   }}
-                  className="transition-all duration-200 rounded-lg text-black border border-gray-300 shadow-xs font-semibold cursor-pointer py-2"
+                  className="h-auto rounded-lg border-gray-300 py-2 text-base font-semibold text-black shadow-xs"
                 >
                   Back
-                </button>
+                </Button>
               )}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

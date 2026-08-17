@@ -1,9 +1,11 @@
 "use client";
 import { layout } from "../page";
-import { Camera, Upload } from "lucide-react";
-import React, { useState } from "react";
+import { Camera, Upload, X } from "lucide-react";
+import React from "react";
 import TakePhotosPane from "./TakePhotosPane";
 import PreviewPane from "./PreviewPane";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const IMAGE_FORMAT_ALLOWED = [
   "image/jpeg",
@@ -62,19 +64,20 @@ export default function PhotosPage({
   return (
     <>
       {currentStep == 2 && (
-        <div className="border border-gray-200 p-5 rounded-xl shadow-md ">
-          <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
-            <Camera className="text-brand-blue size-6" />
+        <Card className="rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div className="mb-1 flex items-center gap-x-2 text-xl font-semibold">
+            <Camera className="size-6 text-brand-blue" />
             <div>How would you like to add photos?</div>
           </div>
-          <div className="text-gray-600 font-medium mb-4">
+          <div className="mb-4 font-medium text-gray-600">
             Choose to take photos directly or upload existing ones
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div
-              className={`border rounded-lg p-6  cursor-pointer transition-all  text-center hover:shadow-md ${
+          <div className="grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              className={`rounded-lg border p-6 text-center transition-all hover:shadow-md ${
                 photoMethod === "take"
-                  ? "border-[#1980E5] bg-blue-50"
+                  ? "border-brand-blue bg-blue-50"
                   : "border-gray-200"
               }`}
               onClick={() => {
@@ -82,18 +85,19 @@ export default function PhotosPage({
                 setPhotoMethod("take");
               }}
             >
-              <Camera className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
-              <div className=" text-xl font-semibold mb-2 text-gray-900">
+              <Camera className="mx-auto mb-4 h-12 w-12 text-brand-blue" />
+              <div className="mb-2 text-xl font-semibold text-gray-900">
                 Take Photos
               </div>
               <p className="text-sm text-gray-600">
                 Use your device camera to take photos directly
               </p>
-            </div>
-            <div
-              className={`border rounded-lg p-6 cursor-pointer transition-all hover:shadow-md text-center ${
+            </button>
+            <button
+              type="button"
+              className={`rounded-lg border p-6 text-center transition-all hover:shadow-md ${
                 photoMethod === "upload"
-                  ? "border-[#1980E5] bg-blue-50"
+                  ? "border-brand-blue bg-blue-50"
                   : "border-gray-200"
               }`}
               onClick={() => {
@@ -101,16 +105,16 @@ export default function PhotosPage({
                 setPhotoMethod("upload");
               }}
             >
-              <Upload className="w-12 h-12 mx-auto mb-4 text-[#1980E5]" />
-              <div className="text-xl font-semibold mb-2 text-gray-900">
+              <Upload className="mx-auto mb-4 h-12 w-12 text-brand-blue" />
+              <div className="mb-2 text-xl font-semibold text-gray-900">
                 Upload Photos
               </div>
               <p className="text-sm text-gray-600">
                 Upload photos from your device or cloud storage
               </p>
-            </div>
+            </button>
           </div>
-        </div>
+        </Card>
       )}
       {currentStep == 3 && selectedLayout && (
         <div>
@@ -124,22 +128,22 @@ export default function PhotosPage({
               aspectRatio={null}
             />
           ) : (
-            <div className="border border-gray-200 p-5 transition-all duration-200 rounded-xl shadow-md ">
-              <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
-                <Upload className="text-brand-blue size-6" />
+            <Card className="rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-200">
+              <div className="mb-1 flex items-center gap-x-2 text-xl font-semibold">
+                <Upload className="size-6 text-brand-blue" />
                 <div>Upload Your Photos</div>
               </div>
-              <div className="text-gray-600 font-medium mb-4">
+              <div className="mb-4 font-medium text-gray-600">
                 Please upload at least {selectedLayout?.photos} photos, or a
                 multiple of {selectedLayout?.photos}.
               </div>
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="font-semibold mb-2 text-gray-900">
+                <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+                  <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                  <h3 className="mb-2 font-semibold text-gray-900">
                     Drag & Drop Photos
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="mb-4 text-gray-600">
                     Or click to browse your files
                   </p>
                   <input
@@ -150,20 +154,20 @@ export default function PhotosPage({
                     className="hidden"
                     id="photo-upload"
                   />
-                  <button className="bg-brand-blue cursor-pointer px-3 py-2 rounded-lg font-semibold text-white">
+                  <Button asChild className="h-auto rounded-lg bg-brand-blue px-3 py-2 font-semibold text-white hover:bg-brand-blue/90">
                     <label htmlFor="photo-upload" className="cursor-pointer">
                       Choose Files
                     </label>
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Shared Gallery for both upload & take */}
           {photos.length > 0 && (
             <div className="mt-4">
-              <h4 className="font-semibold mb-2 text-gray-900">
+              <h4 className="mb-2 font-semibold text-gray-900">
                 Photos ({photos.length}/{selectedLayout!.photos})
               </h4>
               <div className="grid grid-cols-3 gap-2">
@@ -172,12 +176,12 @@ export default function PhotosPage({
                   return (
                     <div
                       key={index}
-                      className="aspect-square relative bg-gray-100 rounded border border-gray-200 flex items-center justify-center"
+                      className="relative flex aspect-square items-center justify-center rounded border border-gray-200 bg-gray-100"
                     >
                       <img
                         src={url}
                         alt={`Photo ${index + 1}`}
-                        className="object-contain w-full h-full"
+                        className="h-full w-full object-contain"
                         onLoad={(e) =>
                           URL.revokeObjectURL(
                             (e.target as HTMLImageElement).src
@@ -191,16 +195,13 @@ export default function PhotosPage({
                             prev.filter((_, i) => i !== index)
                           )
                         }
-                        className="absolute cursor-pointer top-1 right-1 bg-black/50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
+                        className="absolute top-1 right-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black/50 text-xs text-white hover:bg-black/70"
                       >
-                        ✕
+                        <X className="size-3" />
                       </button>
-                      <button
-                        type="button"
-                        className="absolute cursor-pointer top-1 left-1 bg-brand-blue text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
-                      >
+                      <div className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-blue text-xs text-white">
                         {index + 1}
-                      </button>
+                      </div>
                     </div>
                   );
                 })}

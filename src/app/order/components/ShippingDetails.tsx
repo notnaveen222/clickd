@@ -5,6 +5,38 @@ import {
   FieldErrors,
 } from "react-hook-form";
 import { FormFields } from "../page";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+function Field({
+  label,
+  htmlFor,
+  colSpan = 1,
+  error,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  colSpan?: 1 | 2;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={colSpan === 2 ? "col-span-2" : "col-span-2 sm:col-span-1"}>
+      <Label htmlFor={htmlFor} className="mb-1 font-semibold">
+        {label}
+      </Label>
+      {children}
+      {error && (
+        <span className="mt-1 block text-sm font-medium text-red-500">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function ShippingDetailsPage({
   register,
@@ -17,163 +49,96 @@ export default function ShippingDetailsPage({
   onSubmit: (values: FormFields) => void;
   errors: FieldErrors<FormFields>;
 }) {
+  const errClass = "border-red-500 focus-visible:ring-red-500";
+
   return (
-    <div className="border border-gray-200 p-5 rounded-xl shadow-md ">
-      <div className="flex items-center font-semibold text-xl mb-5 gap-x-2">
-        <MapPin className="text-brand-blue size-6" />
-        <div className="">Shipping Information</div>
+    <Card className="rounded-xl border border-gray-200 p-5 shadow-sm">
+      <div className="mb-5 flex items-center gap-x-2 text-xl font-semibold">
+        <MapPin className="size-6 text-brand-blue" />
+        <div>Shipping Information</div>
       </div>
-      <form action="" id="order-form" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid  grid-cols-2 gap-x-3 sm:gap-x-10 gap-y-5">
-          <div className=" w-full col-span-2 sm:col-span-1">
-            <div className=" font-semibold mb-1">Full Name</div>
-            <input
+      <form id="order-form" onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-10">
+          <Field label="Full Name" htmlFor="name" error={errors.name?.message}>
+            <Input
+              id="name"
               type="text"
-              className={`border w-full font-medium outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.name
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/10"
-              }`}
               placeholder="Name"
+              className={errors.name ? errClass : ""}
               {...register("name")}
             />
-            {errors.name && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.name.message}
-              </span>
-            )}
-          </div>
-          <div className="col-span-2 sm:col-span-1">
-            <div className=" font-semibold mb-1">Email</div>
-            <input
+          </Field>
+          <Field label="Email" htmlFor="email" error={errors.email?.message}>
+            <Input
+              id="email"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.email
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="Email"
+              className={errors.email ? errClass : ""}
               {...register("email")}
             />
-            {errors.email && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-          <div className="col-span-2">
-            <div className=" font-semibold mb-1">Address</div>
-            <input
+          </Field>
+          <Field label="Address" htmlFor="address" colSpan={2} error={errors.address?.message}>
+            <Input
+              id="address"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.address
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="Address"
+              className={errors.address ? errClass : ""}
               {...register("address")}
             />
-            {errors.address && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.address.message}
-              </span>
-            )}
-          </div>
-          <div>
-            <div className=" font-semibold mb-1">City</div>
-            <input
+          </Field>
+          <Field label="City" htmlFor="city" error={errors.city?.message}>
+            <Input
+              id="city"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.city
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="City"
+              className={errors.city ? errClass : ""}
               {...register("city")}
             />
-            {errors.city && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.city.message}
-              </span>
-            )}
-          </div>
-          <div>
-            <div className=" font-semibold mb-1">State</div>
-            <input
+          </Field>
+          <Field label="State" htmlFor="state" error={errors.state?.message}>
+            <Input
+              id="state"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.state
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="State"
+              className={errors.state ? errClass : ""}
               {...register("state")}
             />
-            {errors.state && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.state.message}
-              </span>
-            )}
-          </div>
-          <div className="col-span-2 sm:col-span-1">
-            <div className=" font-semibold mb-1">Zip Code</div>
-            <input
+          </Field>
+          <Field label="Zip Code" htmlFor="zipcode" error={errors.zipcode?.message}>
+            <Input
+              id="zipcode"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.zipcode
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="Zip Code"
+              className={errors.zipcode ? errClass : ""}
               {...register("zipcode")}
             />
-            {errors.zipcode && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.zipcode.message}
-              </span>
-            )}
-          </div>
-          <div className="col-span-2 sm:col-span-1">
-            <div className=" font-semibold mb-1 ">Phone Number</div>
-            <input
+          </Field>
+          <Field label="Phone Number" htmlFor="phone" error={errors.phone?.message}>
+            <Input
+              id="phone"
               type="text"
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.phone
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="Phone Number (+91)"
+              className={errors.phone ? errClass : ""}
               {...register("phone")}
             />
-            {errors.phone && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.phone.message}
-              </span>
-            )}
-          </div>
-          <div className="col-span-2">
-            <div className=" font-semibold mb-1">
-              Special Instruction (Optional, Max 100 words)
-            </div>
-            <textarea
+          </Field>
+          <Field
+            label="Special Instruction (Optional, Max 100 words)"
+            htmlFor="additional_instructions"
+            colSpan={2}
+            error={errors.additional_instructions?.message}
+          >
+            <Textarea
+              id="additional_instructions"
               maxLength={500}
               rows={4}
-              className={`border w-full outline-none ring-0 focus:ring-2 transition-all duration-200 focus:outline-neutral-500 rounded-lg py-2 px-2 ${
-                errors.additional_instructions
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-brand-blue border-black/20"
-              }`}
               placeholder="Any Special delivery instructions..."
+              className={errors.additional_instructions ? errClass : ""}
               {...register("additional_instructions")}
             />
-            {errors.additional_instructions && (
-              <span className="text-red-500 text-sm mt-1 block font-medium">
-                {errors.additional_instructions.message}
-              </span>
-            )}
-          </div>
+          </Field>
         </div>
       </form>
-    </div>
+    </Card>
   );
 }

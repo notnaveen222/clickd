@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function DownloadImagesButton({
   clientOrderId,
@@ -21,37 +23,39 @@ export default function DownloadImagesButton({
         throw new Error(msg || `HTTP ${res.status}`);
       }
 
-      // Turn response into a blob
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
 
-      // Create a temporary link and click it
       const a = document.createElement("a");
       a.href = url;
       a.download = `${clientOrderId}-photos.zip`;
       document.body.appendChild(a);
       a.click();
 
-      // Cleanup
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
-      alert("Could not download files");
+      toast.error("Could not download files");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       disabled={loading}
       onClick={handleDownload}
-      className="inline-flex items-center gap-2 rounded-lg cursor-pointer border px-3 py-1.5 text-sm font-semibold hover:bg-black transition-all duration-200 ease-in-out hover:text-white"
     >
-      <Download size={16} />
+      {loading ? (
+        <Loader2 className="animate-spin" />
+      ) : (
+        <Download />
+      )}
       {loading ? "Preparing…" : "Download Images"}
-    </button>
+    </Button>
   );
 }

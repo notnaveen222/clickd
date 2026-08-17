@@ -1,65 +1,64 @@
 import { Mail, Phone, UserRound } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function ContactPage() {
   return (
-    <>
-      <div className="flex grow justify-center items-center pt-2 sm:pt-0 mb-10 sm:mb-0">
-        <div className="border border-gray-200 gap-y-2 p-5 mx-5 flex flex-col items-center rounded-xl shadow-md">
-          <UserRound className="w-10 h-10 " />
+    <div className="mb-10 flex grow items-center justify-center px-3 pt-2 sm:mb-0 sm:pt-0">
+      <Card className="mx-2 flex w-full max-w-2xl flex-col items-center gap-y-2 border-gray-200 p-6 shadow-md sm:p-8">
+        <CardContent className="flex flex-col items-center gap-y-6 p-0">
+          <div className="flex size-14 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+            <UserRound className="size-7" />
+          </div>
 
-          <div className="font-semibold text-4xl mb-10 text-center">
+          <div className="text-center text-4xl font-semibold">
             Contact Our Friendly Team
           </div>
-          <div className="flex flex-col sm:flex-row gap-x-4 gap-y-4">
-            <div className="border border-gray-200 rounded-xl shadow-md flex flex-col justify-between gap-y-12 px-4  py-5 w-72">
-              <div>
-                <Phone className="w-5 h-5" />
-              </div>
-              <div className="flex flex-col w-fit">
-                <div className="font-semibold text-xl">Call Us</div>
 
-                <div className="font-medium text-sub-text  mb-2 ">
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex w-72 flex-col justify-between gap-y-10 rounded-xl border border-gray-200 px-4 py-5 shadow-sm">
+              <div className="flex size-9 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+                <Phone className="size-4" />
+              </div>
+              <div className="flex w-fit flex-col">
+                <div className="text-xl font-semibold">Call Us</div>
+                <div className="mb-2 font-medium text-sub-text">
                   Feel free to text or call the below on any queries.
                 </div>
-                <div className="flex gap-x-2 items-center">
-                  <div className="font-medium underline underline-offset-1">
-                    +91 99628 70308
-                  </div>
-                </div>
-                <div className="flex gap-x-2 items-center">
-                  <div className="font-medium underline underline-offset-1">
-                    +91 99404 76326
-                  </div>
-                </div>
+                <a
+                  href="tel:+919962870308"
+                  className="font-medium underline underline-offset-2 hover:text-brand-blue"
+                >
+                  +91 99628 70308
+                </a>
+                <a
+                  href="tel:+919940476326"
+                  className="font-medium underline underline-offset-2 hover:text-brand-blue"
+                >
+                  +91 99404 76326
+                </a>
               </div>
             </div>
-            <div className="border border-gray-200 rounded-xl shadow-md flex flex-col justify-between gap-y-12 px-4  py-5 w-72">
-              <div>
-                <Mail className="w-5 h-5" />
+            <div className="flex w-72 flex-col justify-between gap-y-10 rounded-xl border border-gray-200 px-4 py-5 shadow-sm">
+              <div className="flex size-9 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+                <Mail className="size-4" />
               </div>
-              <div className="flex flex-col w-fit">
-                <div className="font-semibold text-xl">Email Us</div>
-
-                <div className="font-medium text-sub-text  mb-2 ">
+              <div className="flex w-fit flex-col">
+                <div className="text-xl font-semibold">Email Us</div>
+                <div className="mb-2 font-medium text-sub-text">
                   Contact the below mail for anything related to quotation &
                   Physical Booth.
                 </div>
-                <div className="flex gap-x-2 items-center">
-                  <div className="font-medium underline underline-offset-1"></div>
-                </div>
-                <div className="flex gap-x-2 items-center">
-                  <a
-                    href="mailto:clickd.ofc@gmail.com"
-                    className="font-medium underline underline-offset-1"
-                  >
-                    clickd.ofc@gmail.com
-                  </a>
-                </div>
+                <a
+                  href="mailto:clickd.ofc@gmail.com"
+                  className="font-medium underline underline-offset-2 hover:text-brand-blue"
+                >
+                  clickd.ofc@gmail.com
+                </a>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

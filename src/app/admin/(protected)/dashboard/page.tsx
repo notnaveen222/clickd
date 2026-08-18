@@ -46,7 +46,7 @@ export default async function OrdersPage() {
 
   return (
     <div className="p-5">
-      <div className="mb-1 text-3xl font-semibold">Orders Dashboard</div>
+      <div className="mb-1 text-3xl font-semibold">Orders</div>
       <div className="mb-5 text-sm font-medium text-gray-600">
         Total Unshipped Orders: {total}
       </div>

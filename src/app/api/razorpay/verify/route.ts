@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { logAudit } from "@/lib/audit-log";
 import crypto from "crypto";
 import { confirmUploadedPhotos } from "@/lib/supabase-actions";
 import { readSessionId } from "@/lib/session";
@@ -49,6 +50,22 @@ export async function POST(req: NextRequest) {
           signature_verified: false,
           status: "FAILED",
         };
+    const { error } = await supabaseAdmin
+      .from("orders")
+      .update(update)
+      .eq("razorpay_order_id", razorpay_order_id);
+
+    if (error) {
+      return NextResponse.json({ error: "DB update failed" }, { status: 500 });
+    }
+
+    await logAudit({
+      action: verified ? "order.paid" : "order.payment_failed",
+      actor: email ?? "customer",
+      target: client_order_id,
+      metadata: { razorpay_order_id, razorpay_payment_id },
+    });
+
     if (verified && sid) {
       const res = await confirmUploadedPhotos({
         sessionId: sid,
@@ -58,24 +75,9 @@ export async function POST(req: NextRequest) {
         try {
           await sendConfirmationMail(email, client_order_id);
         } catch (error) {
-          return NextResponse.json(
-            {
-              ok: false,
-              message: "Order Confirmed, but confirmation email failed to send",
-              error,
-            },
-            { status: 502 }
-          );
+          console.error("Failed to send confirmation email:", error);
         }
       }
-    }
-    const { error } = await supabase
-      .from("orders")
-      .update(update)
-      .eq("razorpay_order_id", razorpay_order_id);
-
-    if (error) {
-      return NextResponse.json({ error: "DB update failed" }, { status: 500 });
     }
 
     return NextResponse.json({ ok: verified });

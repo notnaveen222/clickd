@@ -1,3 +1,4 @@
+import { logAudit } from "@/lib/audit-log";
 import { sendShippedMail } from "@/lib/nodemailer-actions";
 import { markOrderShipped } from "@/lib/supabase-actions";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,18 +10,6 @@ export async function POST(request: NextRequest) {
         message: "Order ID Required to mark it shipped",
       });
     }
-    try {
-      await sendShippedMail(toEmail, orderId);
-    } catch (error) {
-      return NextResponse.json(
-        {
-          ok: false,
-          message: "Marked shipped, but email failed to send",
-          error,
-        },
-        { status: 502 }
-      );
-    }
     const result = await markOrderShipped(orderId);
     if (!result?.ok) {
       return NextResponse.json(
@@ -28,7 +17,23 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    //domain then enable
+
+    await logAudit({
+      action: "order.shipped",
+      actor: "admin",
+      target: orderId,
+      metadata: { toEmail },
+    });
+
+    try {
+      await sendShippedMail(toEmail, orderId);
+    } catch (error) {
+      console.error("Failed to send shipped email:", error);
+      return NextResponse.json({
+        ok: true,
+        message: "Marked shipped, but email failed to send",
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

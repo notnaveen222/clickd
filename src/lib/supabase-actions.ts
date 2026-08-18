@@ -1,4 +1,3 @@
-import { supabase } from "./supabase";
 import { BUCKET, supabaseAdmin } from "./supabaseAdmin";
 
 export async function generateClientOrderId() {
@@ -6,7 +5,7 @@ export async function generateClientOrderId() {
   let id = "";
   while (!unique) {
     id = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from("orders")
       .select("id")
       .eq("client_order_id", id)
@@ -65,12 +64,14 @@ export async function confirmUploadedPhotos({
       }
     }
 
-    // // 4. Clean up empty temp folder
-    // try {
-    //   await supabaseAdmin.storage.from(BUCKET).remove([`temp/${sessionId}`]);
-    // } catch (cleanupError) {
-    //   console.error("Error cleaning up temp folder:", cleanupError);
-    // }
+    // 4. Clean up empty temp folder
+    try {
+      await supabaseAdmin.storage
+        .from(BUCKET)
+        .remove(tempFiles.map((file) => `temp/${sessionId}/${file.name}`));
+    } catch (cleanupError) {
+      console.error("Error cleaning up temp folder:", cleanupError);
+    }
 
     return {
       success: true,
@@ -113,7 +114,7 @@ export async function markOrderShipped(id: string) {
 }
 
 export async function getLayoutPrice(id: string): Promise<number> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("prices")
     .select("layoutPrice")
     .eq("layoutId", id)
@@ -122,4 +123,32 @@ export async function getLayoutPrice(id: string): Promise<number> {
     throw error;
   }
   return data.layoutPrice as number;
+}
+
+export type LayoutPrice = {
+  id: string;
+  layoutId: string;
+  layoutPrice: number;
+};
+
+export async function getLayoutPrices(): Promise<LayoutPrice[]> {
+  const { data, error } = await supabaseAdmin
+    .from("prices")
+    .select("id,layoutId,layoutPrice")
+    .order("layoutId", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function updateLayoutPrice(layoutId: string, layoutPrice: number) {
+  const { data, error } = await supabaseAdmin
+    .from("prices")
+    .update({ layoutPrice })
+    .eq("layoutId", layoutId)
+    .select("id,layoutId,layoutPrice")
+    .single();
+  if (error) {
+    return { ok: false as const, error: error.message };
+  }
+  return { ok: true as const, price: data as LayoutPrice };
 }

@@ -1,36 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Image as ImageIcon } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
+import { STRIP_LAYOUTS, type StripLayout } from "@/lib/layouts";
 
-import strip1x3 from "../../../../public/layouts/3photostrip.png";
-import strip1x4 from "../../../../public/layouts/4photostrip.png";
-
-interface layout {
-  id: string;
-  name: string;
-  photos: number;
-  description: string;
+export interface layout extends StripLayout {
   price: number;
-  image_url: StaticImageData;
 }
 
-export const stripLayouts = [
-  {
-    id: "1x3",
-    name: "Photostrip (3 Photos)",
-    photos: 3,
-    description: "3 Photos in a classic strip format ",
-    price: 179,
-    image_url: strip1x3,
-  },
-  {
-    id: "1x4",
-    name: "Photostrip (4 Photos)",
-    photos: 4,
-    description: "4 Photos in a classic strip format ",
-    price: 199,
-    image_url: strip1x4,
-  },
-];
+const FALLBACK_PRICES: Record<string, number> = { "1x3": 179, "1x4": 199 };
 
 export default function LayoutPage({
   selectedLayout,
@@ -39,6 +18,26 @@ export default function LayoutPage({
   selectedLayout: layout | null;
   setSelectedLayout(layout: layout): void;
 }) {
+  const [layouts, setLayouts] = useState<layout[]>(() =>
+    STRIP_LAYOUTS.map((l) => ({ ...l, price: FALLBACK_PRICES[l.id] ?? 0 }))
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/prices")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.prices) return;
+        setLayouts((prev) =>
+          prev.map((l) => ({ ...l, price: data.prices[l.id] ?? l.price }))
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="border border-gray-200 p-5 mx-2 rounded-xl shadow-md">
       <div className="flex items-center font-semibold text-xl mb-1 gap-x-2">
@@ -49,7 +48,7 @@ export default function LayoutPage({
         Select the perfect layout for your photo strip
       </div>
       <div className="grid grid-cols-2 gap-4">
-        {stripLayouts.map((layout) => (
+        {layouts.map((layout) => (
           <div
             key={layout.id}
             className={`border rounded-lg p-2 md:p-4 cursor-pointer transition-all hover:shadow-md ${

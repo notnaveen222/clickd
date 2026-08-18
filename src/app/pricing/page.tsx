@@ -1,6 +1,19 @@
 import Image from "next/image";
-import { stripLayouts } from "../order/components/LayoutForm";
-export default function PricingPage() {
+import { STRIP_LAYOUTS } from "@/lib/layouts";
+import { getLayoutPrices } from "@/lib/supabase-actions";
+
+export const revalidate = 0;
+
+export default async function PricingPage() {
+  const prices = await getLayoutPrices();
+  const priceMap = Object.fromEntries(
+    prices.map((p) => [p.layoutId, p.layoutPrice])
+  );
+  const layouts = STRIP_LAYOUTS.map((l) => ({
+    ...l,
+    price: priceMap[l.id],
+  }));
+
   return (
     <>
       <div className="flex grow justify-center items-center">
@@ -14,10 +27,10 @@ export default function PricingPage() {
             A lot more coming soon !!!
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  w-fit">
-            {stripLayouts.map((layout) => (
+            {layouts.map((layout) => (
               <div
                 key={layout.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md 
+                className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md
                     border-gray-200
                 }`}
               >
@@ -36,7 +49,7 @@ export default function PricingPage() {
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="bg-brand-blue text-white font-semibold px-2 rounded-lg">
-                    ₹{layout.price}
+                    ₹{layout.price ?? "—"}
                   </div>
                 </div>
               </div>
